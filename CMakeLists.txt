@@ -35,7 +35,8 @@ set (SRC ${SRC}
   LibOVR/Src/Kernel/OVR_SysFile.cpp
   LibOVR/Src/Kernel/OVR_System.cpp
   LibOVR/Src/Kernel/OVR_Timer.cpp
-  LibOVR/Src/Kernel/OVR_UTF8Util.cpp)
+  LibOVR/Src/Kernel/OVR_UTF8Util.cpp
+  OpenTK.Rift/OVR.cpp)
 
 if (WIN32)
   set (SRC ${SRC}
