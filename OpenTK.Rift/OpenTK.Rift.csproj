@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Wrapper\" />
+    <Folder Include="LibOVR\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Wrapper\CMakeLists.txt" />
@@ -70,5 +71,105 @@
     <None Include="OpenTK.Rift.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
+    <None Include="LibOVR\Include\OVR.h" />
+    <None Include="LibOVR\Include\OVRVersion.h" />
+    <None Include="LibOVR\Src\OVR_Device.h" />
+    <None Include="LibOVR\Src\OVR_DeviceConstants.h" />
+    <None Include="LibOVR\Src\OVR_DeviceHandle.cpp" />
+    <None Include="LibOVR\Src\OVR_DeviceHandle.h" />
+    <None Include="LibOVR\Src\OVR_DeviceImpl.cpp" />
+    <None Include="LibOVR\Src\OVR_DeviceImpl.h" />
+    <None Include="LibOVR\Src\OVR_DeviceMessages.h" />
+    <None Include="LibOVR\Src\OVR_HIDDevice.h" />
+    <None Include="LibOVR\Src\OVR_HIDDeviceBase.h" />
+    <None Include="LibOVR\Src\OVR_HIDDeviceImpl.h" />
+    <None Include="LibOVR\Src\OVR_JSON.cpp" />
+    <None Include="LibOVR\Src\OVR_JSON.h" />
+    <None Include="LibOVR\Src\OVR_LatencyTestImpl.cpp" />
+    <None Include="LibOVR\Src\OVR_LatencyTestImpl.h" />
+    <None Include="LibOVR\Src\OVR_Linux_DeviceManager.cpp" />
+    <None Include="LibOVR\Src\OVR_Linux_DeviceManager.h" />
+    <None Include="LibOVR\Src\OVR_Linux_HIDDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_Linux_HIDDevice.h" />
+    <None Include="LibOVR\Src\OVR_Linux_HMDDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_Linux_HMDDevice.h" />
+    <None Include="LibOVR\Src\OVR_Linux_SensorDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_OSX_DeviceManager.cpp" />
+    <None Include="LibOVR\Src\OVR_OSX_DeviceManager.h" />
+    <None Include="LibOVR\Src\OVR_OSX_HIDDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_OSX_HIDDevice.h" />
+    <None Include="LibOVR\Src\OVR_OSX_HMDDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_OSX_HMDDevice.h" />
+    <None Include="LibOVR\Src\OVR_OSX_SensorDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_Profile.cpp" />
+    <None Include="LibOVR\Src\OVR_Profile.h" />
+    <None Include="LibOVR\Src\OVR_SensorFilter.cpp" />
+    <None Include="LibOVR\Src\OVR_SensorFilter.h" />
+    <None Include="LibOVR\Src\OVR_SensorFusion.cpp" />
+    <None Include="LibOVR\Src\OVR_SensorFusion.h" />
+    <None Include="LibOVR\Src\OVR_SensorImpl.cpp" />
+    <None Include="LibOVR\Src\OVR_SensorImpl.h" />
+    <None Include="LibOVR\Src\OVR_ThreadCommandQueue.cpp" />
+    <None Include="LibOVR\Src\OVR_ThreadCommandQueue.h" />
+    <None Include="LibOVR\Src\OVR_Win32_DeviceManager.cpp" />
+    <None Include="LibOVR\Src\OVR_Win32_DeviceManager.h" />
+    <None Include="LibOVR\Src\OVR_Win32_DeviceStatus.cpp" />
+    <None Include="LibOVR\Src\OVR_Win32_DeviceStatus.h" />
+    <None Include="LibOVR\Src\OVR_Win32_HIDDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_Win32_HIDDevice.h" />
+    <None Include="LibOVR\Src\OVR_Win32_HMDDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_Win32_HMDDevice.h" />
+    <None Include="LibOVR\Src\OVR_Win32_SensorDevice.cpp" />
+    <None Include="LibOVR\Src\OVR_Win32_SensorDevice.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Alg.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Alg.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Allocator.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Allocator.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Array.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Atomic.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Atomic.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Color.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_ContainerAllocator.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_File.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_File.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_FileFILE.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Hash.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_KeyCodes.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_List.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Log.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Log.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Math.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Math.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_RefCount.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_RefCount.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Std.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Std.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_String.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_String.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_StringHash.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_String_FormatUtil.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_String_PathUtil.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_SysFile.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_SysFile.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_System.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_System.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Threads.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_ThreadsPthread.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_ThreadsWinAPI.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Timer.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_Timer.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_Types.h" />
+    <None Include="LibOVR\Src\Kernel\OVR_UTF8Util.cpp" />
+    <None Include="LibOVR\Src\Kernel\OVR_UTF8Util.h" />
+    <None Include="LibOVR\Src\Util\Util_LatencyTest.cpp" />
+    <None Include="LibOVR\Src\Util\Util_LatencyTest.h" />
+    <None Include="LibOVR\Src\Util\Util_Render_Stereo.cpp" />
+    <None Include="LibOVR\Src\Util\Util_Render_Stereo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
