@@ -43,6 +43,10 @@ namespace OpenTK.Rift
             instance = NativeMethods.Create();
         }
 
+        #region Public Members
+
+        #endregion
+
         #region IDisposable implementation
 
         public void Dispose()
@@ -61,6 +65,8 @@ namespace OpenTK.Rift
 
         #endregion
 
+        #region NativeMethods
+
         static class NativeMethods
         {
             const string lib = "OVR";
@@ -71,6 +77,8 @@ namespace OpenTK.Rift
             [DllImport(lib, EntryPoint = "OVR_Destroy")]
             public static extern OVR_Instance Destroy(OVR_Instance inst);
         }
+
+        #endregion
     }
 }
 

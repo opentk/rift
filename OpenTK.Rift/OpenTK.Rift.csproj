@@ -19,7 +19,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -28,12 +28,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <None Include="OVR.cpp" />
-  </ItemGroup>
+  <Target Name="BeforeBuild">
+    <Message Text="Building OVR library" Importance="normal" />
+    <Exec Command="mkdir obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; (cmake ../../../Wrapper || /usr/bin/cmake ../../../Wrapper || /usr/local/bin/cmake ../../../Wrapper) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
+  </Target>
+  <Target Name="BeforeClean">
+    <Message Text="Cleaning OVR library" Importance="Normal" />
+    <CreateItem Include="bin/**;obj/**">
+      <Output TaskParameter="Include" ItemName="FilesToDelete" />
+    </CreateItem>
+    <Delete Files="@(FilesToDelete)" />
+  </Target>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -50,5 +59,16 @@
   </ProjectExtensions>
   <ItemGroup>
     <Compile Include="OVR.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Wrapper\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Wrapper\CMakeLists.txt" />
+    <None Include="Wrapper\OVR_wrapper.cpp" />
+    <None Include="Wrapper\OVR_wrapper.h" />
+    <None Include="OpenTK.Rift.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
