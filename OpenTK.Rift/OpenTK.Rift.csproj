@@ -33,7 +33,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
     <Message Text="Building OVR library" Importance="normal" />
-    <Exec Command="mkdir obj &amp;&amp; mkdir obj/$(Platform) &amp;&amp; mkdir obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="mkdir -p obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
     <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; (cmake ../../../Wrapper || /usr/bin/cmake ../../../Wrapper || /usr/local/bin/cmake ../../../Wrapper) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
   </Target>
   <Target Name="BeforeClean">
