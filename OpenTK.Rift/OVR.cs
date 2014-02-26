@@ -27,6 +27,7 @@
 //
 #endregion
 
+using OpenTK;
 using System;
 using System.Runtime.InteropServices;
 
@@ -44,6 +45,14 @@ namespace OpenTK.Rift
         }
 
         #region Public Members
+
+        public Quaternion Orientation
+        {
+            get
+            {
+                return NativeMethods.GetOrientation(instance);
+            }
+        }
 
         #endregion
 
@@ -76,6 +85,9 @@ namespace OpenTK.Rift
 
             [DllImport(lib, EntryPoint = "OVR_Destroy")]
             public static extern OVR_Instance Destroy(OVR_Instance inst);
+
+            [DllImport(lib, EntryPoint = "OVR_GetOrientation")]
+            public static extern Quaternion GetOrientation(OVR_Instance inst);
         }
 
         #endregion
