@@ -25,6 +25,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+using System.Security;
+
+
 #endregion
 
 using OpenTK;
@@ -54,6 +57,102 @@ namespace OpenTK.Rift
             }
         }
 
+        public Vector3 Acceleration
+        {
+            get
+            {
+                return NativeMethods.GetAcceleration(instance);
+            }
+        }
+
+        public Vector3 AngularVelocity
+        {
+            get
+            {
+                return NativeMethods.GetAngularVelocity(instance);
+            }
+        }
+
+        public int HResolution
+        {
+            get
+            {
+                return NativeMethods.GetHResolution(instance);
+            }
+        }
+
+        public int VResolution
+        {
+            get
+            {
+                return NativeMethods.GetVResolution(instance);
+            }
+        }
+
+        public int HScreenSize
+        {
+            get
+            {
+                return NativeMethods.GetHScreenSize(instance);
+            }
+        }
+
+        public int VScreenSize
+        {
+            get
+            {
+                return NativeMethods.GetVScreenSize(instance);
+            }
+        }
+
+        public int VScreenCenter
+        {
+            get
+            {
+                return NativeMethods.GetVScreenCenter(instance);
+            }
+        }
+
+        public int LensSeparationDistance
+        {
+            get
+            {
+                return NativeMethods.GetLensSeparationDistance(instance);
+            }
+        }
+
+        public int InterpupillaryDistance
+        {
+            get
+            {
+                return NativeMethods.GetInterpulpillaryDistance(instance);
+            }
+        }
+
+        public int EyeToScreenDistance
+        {
+            get
+            {
+                return NativeMethods.GetEyeToScreenDistance(instance);
+            }
+        }
+
+        public Vector4 DistortionK
+        {
+            get
+            {
+                return NativeMethods.GetDistortionK(instance);
+            }
+        }
+
+        public Vector4 ChromaAbAberration
+        {
+            get
+            {
+                return NativeMethods.GetChromaAbCorrection(instance);
+            }
+        }
+
         #endregion
 
         #region IDisposable implementation
@@ -80,14 +179,73 @@ namespace OpenTK.Rift
         {
             const string lib = "OVR";
 
+            [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_Create")]
             public static extern OVR_Instance Create();
 
+            [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_Destroy")]
             public static extern OVR_Instance Destroy(OVR_Instance inst);
 
+            [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetOrientation")]
             public static extern Quaternion GetOrientation(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetAcceleration")]
+            public static extern Vector3 GetAcceleration(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetAngularVelocity")]
+            public static extern Vector3 GetAngularVelocity(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetHScreenSize")]
+            public static extern int GetHScreenSize(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetVScreenSize")]
+            public static extern int GetVScreenSize(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetVScreenCenter")]
+            public static extern int GetVScreenCenter(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetDesktopX")]
+            public static extern int GetDesktopX(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetDesktopY")]
+            public static extern int GetDesktopY(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetHResolution")]
+            public static extern int GetHResolution(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetVResolution")]
+            public static extern int GetVResolution(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetEyeToScreenDistance")]
+            public static extern int GetEyeToScreenDistance(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetLensSeparationDistance")]
+            public static extern int GetLensSeparationDistance(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetInterpupillaryDistance")]
+            public static extern int GetInterpulpillaryDistance(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetDistortionK")]
+            public static extern Vector4 GetDistortionK(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetChromaAbCorrection")]
+            public static extern Vector4 GetChromaAbCorrection(OVR_Instance inst);
         }
 
         #endregion
