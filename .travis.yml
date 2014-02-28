@@ -8,6 +8,9 @@ before_install:
  - sudo apt-get update -qq > /dev/null
  - sudo apt-get install -qq mono-devel > /dev/null
  - mozroots --import --sync
+ - wget http://build.nuget.org/NuGet.exe
+ - wget https://dl.dropboxusercontent.com/u/30682604/Microsoft.Build.dll
+# - mono NuGet.exe --runtime=v4.0 install OpenTK.Rift/packages.config
 
 script:
  - xbuild && xbuild /p:Configuration=Release
