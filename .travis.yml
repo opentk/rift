@@ -16,5 +16,7 @@ before_install:
  - cd ..
 
 script:
- - xbuild /p:Configuration=Debug
- - xbuild /p:Configuration=Release
+ - xbuild /p:Configuration=Debug /p:Platform=x86
+ - xbuild /p:Configuration=Release /p:Platform=x86
+ - xbuild /p:Configuration=Debug /p:Platform=x64
+ - xbuild /p:Configuration=Release /p:Platform=x64
