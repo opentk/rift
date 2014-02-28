@@ -41,7 +41,7 @@ namespace OpenTK.Rift.Test
 
     class Test : GameWindow
     {
-        OVR ovr = new OVR();
+        static readonly OVR ovr = new OVR();
 
         public Test(int width, int height)
             : base(
