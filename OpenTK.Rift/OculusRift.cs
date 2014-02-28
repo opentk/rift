@@ -35,22 +35,22 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace OpenTK.Rift
+namespace OpenTK
 {
     using OVR_Instance = IntPtr;
 
     /// <summary>
     /// Provides high-level access to an Oculus Rift device.
     /// </summary>
-    public class OVR : IDisposable
+    public class OculusRift : IDisposable
     {
         OVR_Instance instance;
         bool disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenTK.Rift.OVR"/> class.
+        /// Initializes a new instance of the <see cref="OpenTK.OculusRift"/> class.
         /// </summary>
-        public OVR()
+        public OculusRift()
         {
             instance = NativeMethods.Create();
         }
@@ -241,7 +241,7 @@ namespace OpenTK.Rift
         {
             if (disposed)
             {
-                throw new ObjectDisposedException("OVR");
+                throw new ObjectDisposedException(GetType().Name);
             }
         }
 
@@ -250,12 +250,12 @@ namespace OpenTK.Rift
         #region IDisposable implementation
 
         /// <summary>
-        /// Releases all resource used by the <see cref="OpenTK.Rift.OVR"/> object.
+        /// Releases all resource used by the <see cref="OpenTK.OculusRift"/> object.
         /// </summary>
-        /// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="OpenTK.Rift.OVR"/>. The
-        /// <see cref="Dispose()"/> method leaves the <see cref="OpenTK.Rift.OVR"/> in an unusable state. After calling
-        /// <see cref="Dispose()"/>, you must release all references to the <see cref="OpenTK.Rift.OVR"/> so the garbage
-        /// collector can reclaim the memory that the <see cref="OpenTK.Rift.OVR"/> was occupying.</remarks>
+        /// <remarks>Call <see cref="Dispose()"/> when you are finished using the <see cref="OpenTK.OculusRift"/>. The
+        /// <see cref="Dispose()"/> method leaves the <see cref="OpenTK.OculusRift"/> in an unusable state. After calling
+        /// <see cref="Dispose()"/>, you must release all references to the <see cref="OpenTK.OculusRift"/> so the garbage
+        /// collector can reclaim the memory that the <see cref="OpenTK.OculusRift"/> was occupying.</remarks>
         public void Dispose()
         {
             Dispose(true);
@@ -275,12 +275,12 @@ namespace OpenTK.Rift
         }
 
         /// <summary>
-        /// Releases unmanaged resources and performs other cleanup operations before the <see cref="OpenTK.Rift.OVR"/>
+        /// Releases unmanaged resources and performs other cleanup operations before the <see cref="OpenTK.OculusRift"/>
         /// is reclaimed by garbage collection.
         /// </summary>
-        ~OVR()
+        ~OculusRift()
         {
-            Console.Error.WriteLine("[Warning] OVR instance leaked. Did you forget to call Dispose()?");
+            Console.Error.WriteLine("[Warning] OculusRift instance leaked. Did you forget to call Dispose()?");
         }
 
         #endregion

@@ -71,7 +71,7 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <Compile Include="OVR.cs" />
+    <Compile Include="OculusRift.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Wrapper\" />
