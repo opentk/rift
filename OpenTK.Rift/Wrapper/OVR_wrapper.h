@@ -46,6 +46,8 @@ extern "C"
         float x, y, z, w;
     } OVR_Vector4;
 
+    void OVR_Init();
+    void OVR_Shutdown();
     OVR_Instance* OVR_Create();
     void OVR_Destroy(OVR_Instance *inst);
     OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);

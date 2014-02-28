@@ -34,9 +34,28 @@
 
 using namespace OVR;
 
-struct OVR_Instance
+struct OVR_SystemInstance
 {
     DeviceManager *Manager;
+
+    OVR_SystemInstance()
+    {
+        System::Init();
+        Manager = DeviceManager::Create();
+        assert(Manager);
+    }
+
+    ~OVR_SystemInstance()
+    {
+        Manager->Release();
+        Manager = nullptr;
+        System::Destroy();
+    }
+};
+
+struct OVR_Instance
+{
+    OVR_SystemInstance *System;
     HMDDevice     *Device;
     SensorDevice  *Sensor;
     SensorFusion  *Fusion;
@@ -45,6 +64,8 @@ struct OVR_Instance
 
 namespace
 {
+    static OVR_SystemInstance *SystemInstance = nullptr;
+
     inline OVR_Quaternion quat_to_quat(Quatf q)
     {
         OVR_Quaternion ret;
@@ -52,6 +73,7 @@ namespace
         ret.y = q.y;
         ret.z = q.z;
         ret.w = q.w;
+        return ret;
     }
 
     inline OVR_Vector3 vec3_to_vec3(Vector3f v)
@@ -60,6 +82,7 @@ namespace
         ret.x = v.x;
         ret.y = v.y;
         ret.z = v.z;
+        return ret;
     }
 
     inline OVR_Vector4 float4_to_vec4(float v[4])
@@ -73,18 +96,30 @@ namespace
     }
 }
 
+void OVR_Init()
+{
+    assert(!SystemInstance);
+    SystemInstance = new OVR_SystemInstance();
+}
+
+void OVR_Shutdown()
+{
+    assert(SystemInstance);
+    delete SystemInstance;
+    SystemInstance = nullptr;
+}
+
 OVR_Instance* OVR_Create()
 {
+    assert(SystemInstance);
     OVR_Instance *inst = new OVR_Instance();
+
     assert(inst);
     memset(inst, 0, sizeof(OVR_Instance));
 
-    System::Init();
-
+    inst->System = SystemInstance;
     inst->Fusion = new SensorFusion();
-    inst->Manager = DeviceManager::Create();
-
-    inst->Device = inst->Manager->EnumerateDevices<HMDDevice>().CreateDevice();
+    inst->Device = inst->System->Manager->EnumerateDevices<HMDDevice>().CreateDevice();
 
     if (inst->Device)
     {
@@ -93,7 +128,7 @@ OVR_Instance* OVR_Create()
     }
     else
     {
-       inst->Sensor = inst->Manager->EnumerateDevices<SensorDevice>().CreateDevice();
+       inst->Sensor = inst->System->Manager->EnumerateDevices<SensorDevice>().CreateDevice();
     }
 
     if (inst->Sensor)
@@ -107,11 +142,12 @@ OVR_Instance* OVR_Create()
 void OVR_Destroy(OVR_Instance *inst)
 {
     assert(inst);
-    //inst->Sensor->Clear();
-    //inst->Device->Clear();
-    //inst->Manager->Clear();
     delete inst->Fusion;
-    System::Destroy();
+    delete inst->Sensor;
+    delete inst->Device;
+    inst->Fusion = nullptr;
+    inst->Sensor = nullptr;
+    inst->Device = nullptr;
 }
 
 OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)

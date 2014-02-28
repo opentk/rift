@@ -30,8 +30,9 @@
 using OpenTK;
 using System;
 using System.Diagnostics;
-using System.Security;
 using System.Runtime.InteropServices;
+using System.Security;
+using System.Threading;
 
 namespace OpenTK
 {
@@ -42,6 +43,7 @@ namespace OpenTK
     /// </summary>
     public class OculusRift : IDisposable
     {
+        static int instance_count;
         OVR_Instance instance;
         bool disposed;
 
@@ -52,6 +54,11 @@ namespace OpenTK
         /// </summary>
         public OculusRift()
         {
+            if (Interlocked.Increment(ref instance_count) == 1)
+            {
+                NativeMethods.Init();
+            }
+
             instance = NativeMethods.Create();
         }
 
@@ -271,7 +278,12 @@ namespace OpenTK
                 if (manual)
                 {
                     NativeMethods.Destroy(instance);
+                    if (Interlocked.Decrement(ref instance_count) == 0)
+                    {
+                        NativeMethods.Shutdown();
+                    }
                 }
+
                 disposed = true;
             }
         }
@@ -292,6 +304,14 @@ namespace OpenTK
         static class NativeMethods
         {
             const string lib = "OVR";
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_Init")]
+            public static extern void Init();
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_Shutdown")]
+            public static extern void Shutdown();
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_Create")]
