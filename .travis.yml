@@ -8,10 +8,13 @@ before_install:
  - sudo apt-get update -qq > /dev/null
  - sudo apt-get install -qq mono-devel > /dev/null
  - mozroots --import --sync
- - mkdir -p packages && cd packages
+ - mkdir -p packages
+ - cd packages
  - wget http://build.nuget.org/NuGet.exe
  - wget https://dl.dropboxusercontent.com/u/30682604/Microsoft.Build.dll
  - mono --runtime=v4.0 NuGet.exe install OpenTK
+ - cd ..
 
 script:
- - xbuild && xbuild /p:Configuration=Release
+ - xbuild /p:Configuration=Debug
+ - xbuild /p:Configuration=Release
