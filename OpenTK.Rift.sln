@@ -3,18 +3,34 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.Rift", "OpenTK.Rift\OpenTK.Rift.csproj", "{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.Rift.Test", "OpenTK.Rift.Test\OpenTK.Rift.Test.csproj", "{95544C84-8678-4DC6-A5CB-015879E31681}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Debug|x64.ActiveCfg = Debug|x64
+		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Debug|x64.Build.0 = Debug|x64
 		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Debug|x86.ActiveCfg = Debug|x86
 		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Debug|x86.Build.0 = Debug|x86
+		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Release|x64.ActiveCfg = Release|x64
+		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Release|x64.Build.0 = Release|x64
 		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Release|x86.ActiveCfg = Release|x86
 		{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}.Release|x86.Build.0 = Release|x86
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Debug|x64.ActiveCfg = Debug|x64
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Debug|x64.Build.0 = Debug|x64
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Debug|x86.ActiveCfg = Debug|x86
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Debug|x86.Build.0 = Debug|x86
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x64.ActiveCfg = Release|x64
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x64.Build.0 = Release|x64
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x86.ActiveCfg = Release|x86
+		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = OpenTK.Rift\OpenTK.Rift.csproj
+		StartupItem = OpenTK.Rift.Test\OpenTK.Rift.Test.csproj
 	EndGlobalSection
 EndGlobal
