@@ -8,7 +8,7 @@ namespace OpenTK.Rift.TestConsole
         {
             try
             {
-                using (OculusRift rift = new OculusRift())
+                using (OculusRift ovr = new OculusRift())
                 {
                     do
                     {
