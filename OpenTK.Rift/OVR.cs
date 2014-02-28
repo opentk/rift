@@ -32,6 +32,7 @@ using System.Security;
 
 using OpenTK;
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace OpenTK.Rift
@@ -279,7 +280,7 @@ namespace OpenTK.Rift
         /// </summary>
         ~OVR()
         {
-            Dispose(false);
+            Console.Error.WriteLine("[Warning] OVR instance leaked. Did you forget to call Dispose()?");
         }
 
         #endregion
