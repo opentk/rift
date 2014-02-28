@@ -48,7 +48,7 @@ struct OVR_SystemInstance
     ~OVR_SystemInstance()
     {
         Manager->Release();
-        Manager = nullptr;
+        Manager = NULL;
         System::Destroy();
     }
 };
@@ -64,7 +64,7 @@ struct OVR_Instance
 
 namespace
 {
-    static OVR_SystemInstance *SystemInstance = nullptr;
+    static OVR_SystemInstance *SystemInstance = NULL;
 
     inline OVR_Quaternion quat_to_quat(Quatf q)
     {
@@ -106,7 +106,7 @@ void OVR_Shutdown()
 {
     assert(SystemInstance);
     delete SystemInstance;
-    SystemInstance = nullptr;
+    SystemInstance = NULL;
 }
 
 OVR_Instance* OVR_Create()
@@ -145,9 +145,9 @@ void OVR_Destroy(OVR_Instance *inst)
     delete inst->Fusion;
     delete inst->Sensor;
     delete inst->Device;
-    inst->Fusion = nullptr;
-    inst->Sensor = nullptr;
-    inst->Device = nullptr;
+    inst->Fusion = NULL;
+    inst->Sensor = NULL;
+    inst->Device = NULL;
 }
 
 OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)
