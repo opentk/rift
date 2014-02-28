@@ -53,18 +53,18 @@ extern "C"
     OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);
     OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst);
     OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst);
-    float OVR_GetHScreenSize(OVR_Instance *inst);
-    float OVR_GetVScreenSize(OVR_Instance *inst);
-    float OVR_GetVScreenCenter(OVR_Instance *inst);
+    OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst);
+    OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst);
     int OVR_GetDesktopX(OVR_Instance *inst);
     int OVR_GetDesktopY(OVR_Instance *inst);
     int OVR_GetHResolution(OVR_Instance *inst);
     int OVR_GetVResolution(OVR_Instance *inst);
+    float OVR_GetHScreenSize(OVR_Instance *inst);
+    float OVR_GetVScreenSize(OVR_Instance *inst);
+    float OVR_GetVScreenCenter(OVR_Instance *inst);
     float OVR_GetEyeToScreenDistance(OVR_Instance *inst);
     float OVR_GetLensSeparationDistance(OVR_Instance *inst);
     float OVR_GetInterpupillaryDistance(OVR_Instance *inst);
-    OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst);
-    OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst);
 }
 
 #endif

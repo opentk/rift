@@ -21,6 +21,8 @@ namespace OpenTK.Rift.TestConsole
                         Console.WriteLine("Angular velocity (rad/s):     {0}", ovr.AngularVelocity);
                         Console.WriteLine("Chroma aberration:            {0}", ovr.ChromaAbAberration);
                         Console.WriteLine("Distortion K:                 {0}", ovr.DistortionK);
+                        Console.WriteLine("Desktop x-position (px):      {0}", ovr.DesktopX);
+                        Console.WriteLine("Desktop y-position (px):      {0}", ovr.DesktopY);
                         Console.WriteLine("Horizonal resolution (px):    {0}", ovr.HResolution);
                         Console.WriteLine("Vertical resolution (px):     {0}", ovr.VResolution);
                         Console.WriteLine("Eye-screen distance (m):      {0}", ovr.EyeToScreenDistance);

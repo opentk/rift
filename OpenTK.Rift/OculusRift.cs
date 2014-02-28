@@ -111,6 +111,32 @@ namespace OpenTK
         }
 
         /// <summary>
+        /// Gets the x-coordinate of the Oculus Rift display device,
+        /// in global desktop coordinates (px).
+        /// </summary>
+        public int DesktopX
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetDesktopX(instance);
+            }
+        }
+
+        /// <summary>
+        /// Gets the y-coordinate of the Oculus Rift display device,
+        /// in global desktop coordinates (px).
+        /// </summary>
+        public int DesktopY
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetDesktopY(instance);
+            }
+        }
+
+        /// <summary>
         /// Horizontal resolution of the entire HMD screen in pixels.
         /// Half the HResolution is used for each eye.
         /// This value is 1280 for the Development Kit.
