@@ -1,5 +1,5 @@
 ﻿//
-// OVR.cpp
+// OVR_wrapper.cpp
 //
 // Author:
 //       Stefanos A. <stapostol@gmail.com>
