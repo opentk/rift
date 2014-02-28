@@ -31,25 +31,30 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
-using OpenTK.Rift;
 using System;
+using System.Linq;
 
 namespace OpenTK.Rift.Test
 {
-    using Keyboard = OpenTK.Input.Keyboard;
-    using Mouse = OpenTK.Input.Mouse;
-
     class Test : GameWindow
     {
         static readonly OculusRift ovr = new OculusRift();
+        static readonly DisplayDevice display =
+            (Enumerable
+                .Range((int)DisplayIndex.First, (int)DisplayIndex.Sixth)
+                .Select(i => DisplayDevice.GetDisplay(DisplayIndex.First + i))
+                .Where(d => d != null && d.Width == ovr.HResolution && d.Height == ovr.VResolution)
+                .FirstOrDefault()) ??
+            DisplayDevice.Default;
 
         public Test(int width, int height)
             : base(
-                ovr.VResolution,
-                ovr.HResolution,
+                display.Width,
+                display.Height,
                 new GraphicsMode(32, 24, 8, 16),
                 "OpenTK Oculus Rift Test",
-                GameWindowFlags.Fullscreen)
+                GameWindowFlags.Fullscreen,
+                display)
         {
         }
 
@@ -57,16 +62,27 @@ namespace OpenTK.Rift.Test
         {
         }
 
+        protected override void OnUnload(EventArgs e)
+        {
+            ovr.Dispose();
+        }
+
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-
+            if (Keyboard[Key.Escape])
+                Close();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            GL.Clear(
+                ClearBufferMask.ColorBufferBit |
+                ClearBufferMask.DepthBufferBit |
+                ClearBufferMask.StencilBufferBit);
+
             SwapBuffers();
         }
-
+            
         public static void Main()
         {
             using (Toolkit.Init())
