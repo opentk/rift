@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.Rift", "OpenTK.Rift\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.Rift.Test", "OpenTK.Rift.Test\OpenTK.Rift.Test.csproj", "{95544C84-8678-4DC6-A5CB-015879E31681}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.Rift.TestConsole", "OpenTK.Rift.TestConsole\OpenTK.Rift.TestConsole.csproj", "{EBFBC079-3357-4707-94E7-26BB904DF4E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -29,6 +31,14 @@ Global
 		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x64.Build.0 = Release|x64
 		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x86.ActiveCfg = Release|x86
 		{95544C84-8678-4DC6-A5CB-015879E31681}.Release|x86.Build.0 = Release|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Debug|x64.ActiveCfg = Debug|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Debug|x64.Build.0 = Debug|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Debug|x86.ActiveCfg = Debug|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Debug|x86.Build.0 = Debug|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Release|x64.ActiveCfg = Release|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Release|x64.Build.0 = Release|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Release|x86.ActiveCfg = Release|x86
+		{EBFBC079-3357-4707-94E7-26BB904DF4E8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = OpenTK.Rift.Test\OpenTK.Rift.Test.csproj
