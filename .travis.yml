@@ -18,5 +18,5 @@ before_install:
 script:
  - xbuild /p:Configuration=Debug /p:Platform=x86
  - xbuild /p:Configuration=Release /p:Platform=x86
- - xbuild /p:Configuration=Debug /p:Platform=x64
- - xbuild /p:Configuration=Release /p:Platform=x64
+ - xbuild /p:Configuration=Debug /p:Platform="Any CPU"
+ - xbuild /p:Configuration=Release /p:Platform="Any CPU"
