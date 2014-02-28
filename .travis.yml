@@ -1,5 +1,9 @@
 language: c
 
+env:
+ global:
+  - export EnableNuGetPackageRestore=true
+
 before_install:
  - sudo apt-get update -qq > /dev/null
  - sudo apt-get install -qq mono-devel > /dev/null
