@@ -25,14 +25,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-using System.Security;
-
-
 #endregion
 
 using OpenTK;
 using System;
 using System.Diagnostics;
+using System.Security;
 using System.Runtime.InteropServices;
 
 namespace OpenTK
@@ -47,6 +45,8 @@ namespace OpenTK
         OVR_Instance instance;
         bool disposed;
 
+        #region Constructors
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenTK.OculusRift"/> class.
         /// </summary>
@@ -54,6 +54,8 @@ namespace OpenTK
         {
             instance = NativeMethods.Create();
         }
+
+        #endregion
 
         #region Public Members
 
