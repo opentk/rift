@@ -41,7 +41,37 @@ struct OVR_Instance
     SensorDevice  *Sensor;
     SensorFusion  *Fusion;
     HMDInfo       Info;
-} ;
+};
+
+namespace
+{
+    inline OVR_Quaternion quat_to_quat(Quatf q)
+    {
+        OVR_Quaternion ret;
+        ret.x = q.x;
+        ret.y = q.y;
+        ret.z = q.z;
+        ret.w = q.w;
+    }
+
+    inline OVR_Vector3 vec3_to_vec3(Vector3f v)
+    {
+        OVR_Vector3 ret;
+        ret.x = v.x;
+        ret.y = v.y;
+        ret.z = v.z;
+    }
+
+    inline OVR_Vector4 float4_to_vec4(float v[4])
+    {
+        OVR_Vector4 ret;
+        ret.x = v[0];
+        ret.y = v[1];
+        ret.z = v[2];
+        ret.w = v[3];
+        return ret;
+    }
+}
 
 OVR_Instance* OVR_Create()
 {
@@ -84,8 +114,77 @@ void OVR_Destroy(OVR_Instance *inst)
     System::Destroy();
 }
 
-Quaternion OVR_GetOrientation(OVR_Instance *inst)
+OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)
 {
-    Quatf q = inst->Fusion->GetOrientation();
-    return *(Quaternion*)&q;
+    return quat_to_quat(inst->Fusion->GetOrientation());
+}
+
+OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst)
+{
+    return vec3_to_vec3(inst->Fusion->GetAcceleration());
+}
+
+OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst)
+{
+    return vec3_to_vec3(inst->Fusion->GetAngularVelocity());
+}
+
+int OVR_GetHScreenSize(OVR_Instance *inst)
+{
+    return inst->Info.HScreenSize;
+}
+
+int OVR_GetVScreenSize(OVR_Instance *inst)
+{
+    return inst->Info.VScreenSize;
+}
+
+int OVR_GetVScreenCenter(OVR_Instance *inst)
+{
+    return inst->Info.VScreenCenter;
+}
+
+int OVR_GetDesktopX(OVR_Instance *inst)
+{
+    return inst->Info.DesktopX;
+}
+
+int OVR_GetDesktopY(OVR_Instance *inst)
+{
+    return inst->Info.DesktopY;
+}
+
+int OVR_GetHResolution(OVR_Instance *inst)
+{
+    return inst->Info.HResolution;
+}
+
+int OVR_GetVResolution(OVR_Instance *inst)
+{
+    return inst->Info.VResolution;
+}
+
+int OVR_GetEyeToScreenDistance(OVR_Instance *inst)
+{
+    return inst->Info.EyeToScreenDistance;
+}
+
+int OVR_GetLensSeparationDistance(OVR_Instance *inst)
+{
+    return inst->Info.LensSeparationDistance;
+}
+
+int OVR_GetInterpupillaryDistance(OVR_Instance *inst)
+{
+    return inst->Info.InterpupillaryDistance;
+}
+
+OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst)
+{
+    return float4_to_vec4(inst->Info.DistortionK);
+}
+
+OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst)
+{
+    return float4_to_vec4(inst->Info.ChromaAbCorrection);
 }
