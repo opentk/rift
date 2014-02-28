@@ -46,8 +46,14 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
     <Message Text="Building OVR library" Importance="normal" />
+    <PropertyGroup>
+      <CMakeArgs>-DCMAKE_BUILD_TYPE=$(Configuration) -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=../../../../bin/$(Platform)/$(Configuration) --build ../../../Wrapper</CMakeArgs>
+    </PropertyGroup>
+    <PropertyGroup>
+      <CMake>(cmake $(CMakeArgs) || /usr/bin/cmake $(CMakeArgs) || /usr/local/bin/cmake $(CMakeArgs))</CMake>
+    </PropertyGroup>
     <Exec Command="mkdir -p obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
-    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; (cmake ../../../Wrapper || /usr/bin/cmake ../../../Wrapper || /usr/local/bin/cmake ../../../Wrapper) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
   </Target>
   <Target Name="BeforeClean">
     <Message Text="Cleaning OVR library" Importance="Normal" />
