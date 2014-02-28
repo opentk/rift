@@ -142,7 +142,7 @@ namespace OpenTK
         /// HScreenSize is used for each eye. The current physical screen size is
         /// 149.76 x 93.6mm, which will be reported as 0.14976f x 0.0935f.
         /// </summary>
-        public int HScreenSize
+        public float HScreenSize
         {
             get
             {
@@ -156,7 +156,7 @@ namespace OpenTK
         /// HScreenSize is used for each eye. The current physical screen size is
         /// 149.76 x 93.6mm, which will be reported as 0.14976f x 0.0935f.
         /// </summary>
-        public int VScreenSize
+        public float VScreenSize
         {
             get
             {
@@ -169,7 +169,7 @@ namespace OpenTK
         /// Physical offset from the top of the screen to eye center, in meters.
         /// Currently half VScreenSize.
         /// </summary>
-        public int VScreenCenter
+        public float VScreenCenter
         {
             get
             {
@@ -182,7 +182,7 @@ namespace OpenTK
         /// Physical distance between the lens centers, in meters. Lens centers
         /// are the centers of distortion.
         /// </summary>
-        public int LensSeparationDistance
+        public float LensSeparationDistance
         {
             get
             {
@@ -194,7 +194,7 @@ namespace OpenTK
         /// <summary>
         /// Configured distance between eye centers.
         /// </summary>
-        public int InterpupillaryDistance
+        public float InterpupillaryDistance
         {
             get
             {
@@ -208,7 +208,7 @@ namespace OpenTK
         /// distances from the eye to the lens, and from the lens to the screen.
         /// This value is needed to compute the fov correctly.
         /// </summary>
-        public int EyeToScreenDistance
+        public float EyeToScreenDistance
         {
             get
             {
@@ -335,15 +335,15 @@ namespace OpenTK
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetHScreenSize")]
-            public static extern int GetHScreenSize(OVR_Instance inst);
+            public static extern float GetHScreenSize(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetVScreenSize")]
-            public static extern int GetVScreenSize(OVR_Instance inst);
+            public static extern float GetVScreenSize(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetVScreenCenter")]
-            public static extern int GetVScreenCenter(OVR_Instance inst);
+            public static extern float GetVScreenCenter(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetDesktopX")]
@@ -363,15 +363,15 @@ namespace OpenTK
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetEyeToScreenDistance")]
-            public static extern int GetEyeToScreenDistance(OVR_Instance inst);
+            public static extern float GetEyeToScreenDistance(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetLensSeparationDistance")]
-            public static extern int GetLensSeparationDistance(OVR_Instance inst);
+            public static extern float GetLensSeparationDistance(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetInterpupillaryDistance")]
-            public static extern int GetInterpulpillaryDistance(OVR_Instance inst);
+            public static extern float GetInterpulpillaryDistance(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetDistortionK")]
