@@ -60,6 +60,15 @@ struct OVR_Instance
     SensorDevice  *Sensor;
     SensorFusion  *Fusion;
     HMDInfo       *Info;
+
+    OVR_Instance() :
+        System(NULL),
+        Device(NULL),
+        Sensor(NULL),
+        Fusion(NULL),
+        Info(NULL)
+    {
+    }
 };
 
 namespace
@@ -112,10 +121,9 @@ void OVR_Shutdown()
 OVR_Instance* OVR_Create()
 {
     assert(SystemInstance);
-    OVR_Instance *inst = new OVR_Instance();
 
+    OVR_Instance *inst = new OVR_Instance();
     assert(inst);
-    memset(inst, 0, sizeof(OVR_Instance));
 
     inst->System = SystemInstance;
     inst->Fusion = new SensorFusion();
@@ -159,90 +167,120 @@ void OVR_Destroy(OVR_Instance *inst)
 
 OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)
 {
-    assert(inst);
-    return quat_to_quat(inst->Fusion->GetOrientation());
+    return
+        inst && inst->Fusion ?
+        quat_to_quat(inst->Fusion->GetOrientation()) :
+        (OVR_Quaternion){ 0 };
 }
 
 OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst)
 {
-    assert(inst);
-    return vec3_to_vec3(inst->Fusion->GetAcceleration());
+    return
+        inst && inst->Fusion ?
+        vec3_to_vec3(inst->Fusion->GetAcceleration()) :
+        (OVR_Vector3){ 0 };
 }
 
 OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst)
 {
-    assert(inst);
-    return vec3_to_vec3(inst->Fusion->GetAngularVelocity());
+    return
+        inst && inst->Fusion ?
+        vec3_to_vec3(inst->Fusion->GetAngularVelocity()) :
+        (OVR_Vector3){ 0 };
 }
 
 float OVR_GetHScreenSize(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->HScreenSize;
+    return
+        inst && inst->Info ?
+        inst->Info->HScreenSize :
+        0;
 }
 
 float OVR_GetVScreenSize(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->VScreenSize;
+    return
+        inst && inst->Info ?
+        inst->Info->VScreenSize :
+        0;
 }
 
 float OVR_GetVScreenCenter(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->VScreenCenter;
+    return
+        inst && inst->Info ?
+        inst->Info->VScreenCenter :
+        0;
 }
 
 int OVR_GetDesktopX(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->DesktopX;
+    return
+        inst && inst->Info ?
+        inst->Info->DesktopX :
+        0;
 }
 
 int OVR_GetDesktopY(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->DesktopY;
+    return
+        inst && inst->Info ?
+        inst->Info->DesktopY :
+        0;
 }
 
 int OVR_GetHResolution(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->HResolution;
+    return
+        inst && inst->Info ?
+        inst->Info->HResolution :
+        0;
 }
 
 int OVR_GetVResolution(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->VResolution;
+    return
+        inst && inst->Info ?
+        inst->Info->VResolution :
+        0;
 }
 
 float OVR_GetEyeToScreenDistance(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->EyeToScreenDistance;
+    return
+        inst && inst->Info ?
+        inst->Info->EyeToScreenDistance :
+        0;
 }
 
 float OVR_GetLensSeparationDistance(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->LensSeparationDistance;
+    return
+        inst && inst->Info ?
+        inst->Info->LensSeparationDistance :
+        0;
 }
 
 float OVR_GetInterpupillaryDistance(OVR_Instance *inst)
 {
-    assert(inst);
-    return inst->Info->InterpupillaryDistance;
+    return
+        inst && inst->Info ?
+        inst->Info->InterpupillaryDistance :
+        0;
 }
 
 OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst)
 {
-    assert(inst);
-    return float4_to_vec4(inst->Info->DistortionK);
+    return
+        inst && inst->Info ?
+        float4_to_vec4(inst->Info->DistortionK) :
+        (OVR_Vector4){ 0 };
 }
 
 OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst)
 {
-    assert(inst);
-    return float4_to_vec4(inst->Info->ChromaAbCorrection);
+    return
+        inst && inst->Info ?
+        float4_to_vec4(inst->Info->ChromaAbCorrection) :
+        (OVR_Vector4){ 0 };
 }
