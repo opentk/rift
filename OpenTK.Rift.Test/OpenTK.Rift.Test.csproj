@@ -54,13 +54,14 @@
     <Reference Include="OpenTK">
       <HintPath>..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
     <Compile Include="OculusCamera.cs" />
+    <Compile Include="Program.cs" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

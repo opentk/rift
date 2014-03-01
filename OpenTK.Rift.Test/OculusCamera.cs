@@ -34,8 +34,7 @@ namespace OpenTK.Rift.Test
 {
     enum CameraType
     {
-        Center = 0,
-        Default = Center, 
+        Default = 0,
         Left,
         Right
     }
@@ -70,7 +69,10 @@ namespace OpenTK.Rift.Test
             {
                 float view_center = rift.HScreenSize * 0.25f;
                 float eye_projection_shift = view_center - rift.LensSeparationDistance * 0.5f;
-                float projection_center_offset = 4.0f * eye_projection_shift / rift.HScreenSize;
+                float projection_center_offset =
+                    rift.IsConnected ?
+                    4.0f * eye_projection_shift / rift.HScreenSize :
+                    0;
 
                 GetProjectionMatrix(out mono_frustum);
                 left_frustum = Matrix4.CreateTranslation(projection_center_offset * 0.5f, 0, 0) * mono_frustum;
@@ -115,7 +117,14 @@ namespace OpenTK.Rift.Test
         {
             get
             {
-                return 0.5f * rift.HResolution / (float)rift.VResolution;
+                if (rift.IsConnected)
+                {
+                    return 0.5f * rift.HResolution / (float)rift.VResolution;
+                }
+                else
+                {
+                    return 16.0f / 9.0f;
+                }
             }
         }
 
@@ -123,9 +132,16 @@ namespace OpenTK.Rift.Test
         {
             get
             {
-                return (float)(
-                    2.0f * Math.Atan(
-                        0.5f * rift.VScreenSize / rift.EyeToScreenDistance));
+                if (rift.IsConnected)
+                {
+                    return (float)(
+                        2.0f * Math.Atan(
+                            0.5f * rift.VScreenSize / rift.EyeToScreenDistance));
+                }
+                else
+                {
+                    return 45;
+                }
             }
         }
 
@@ -189,7 +205,7 @@ namespace OpenTK.Rift.Test
         {
             switch (type)
             {
-                case CameraType.Center:
+                case CameraType.Default:
                     matrix = mono_frustum;
                     break;
 
@@ -212,7 +228,7 @@ namespace OpenTK.Rift.Test
 
             switch (type)
             {
-                case CameraType.Center:
+                case CameraType.Default:
                     // Nothing to do
                     break;
 
