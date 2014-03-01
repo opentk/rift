@@ -22,7 +22,7 @@ Instructions
 
 OpenTK.Rift consists of two parts: a native, platform-specific library (libOVR) and a C#, platform-independent wrapper (OpenTK.Rift.dll). You need both parts in order to run an Oculus Rift application.
 
-0. Clone OpenTK.Rift using a git client.
+Begin by cloning OpenTK.Rift using the git client of your choice.
 
 Windows:
 
