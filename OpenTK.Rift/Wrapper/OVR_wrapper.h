@@ -51,9 +51,6 @@ extern "C"
     OVR_Instance* OVR_Create();
     void OVR_Destroy(OVR_Instance *inst);
     int OVR_IsConnected(OVR_Instance *inst);
-    OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);
-    OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst);
-    OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst);
     OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst);
     OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst);
     int OVR_GetDesktopX(OVR_Instance *inst);
@@ -66,6 +63,16 @@ extern "C"
     float OVR_GetEyeToScreenDistance(OVR_Instance *inst);
     float OVR_GetLensSeparationDistance(OVR_Instance *inst);
     float OVR_GetInterpupillaryDistance(OVR_Instance *inst);
+
+    // Sensor Fusion
+    OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);
+    OVR_Quaternion OVR_GetPredictedOrientation(OVR_Instance *inst);
+    OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst);
+    OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst);
+    float OVR_GetPredictionDelta(OVR_Instance *inst);
+    void OVR_SetPrediction(OVR_Instance *inst, float dt, int enable);
+    void OVR_SetPredictionEnabled(OVR_Instance *inst, int enable);
+    int OVR_IsPredictionEnabled(OVR_Instance *inst);
 }
 
 #endif

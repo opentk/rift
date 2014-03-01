@@ -78,51 +78,7 @@ namespace OpenTK
                 return NativeMethods.IsConnected(instance);
             }
         }
-
-        /// <summary>
-        /// Gets a <see cref="OpenTK.Quaternion"/> representing
-        /// the current accumulated orientation.
-        /// Use <see cref="OpenTK.Quaternion.ToAxisAngle()"/> to
-        /// convert this quaternion to an axis-angle representation.
-        /// Use <see cref="OpenTK.Matrix4.CreateFromQuaternion(OpenTK.Quaternion)"/>
-        /// to convert this quaternion to a rotation matrix.
-        /// </summary>
-        /// <value>The orientation.</value>
-        public Quaternion Orientation
-        {
-            get
-            {
-                CheckDisposed();
-                return NativeMethods.GetOrientation(instance);
-            }
-        }
-
-        /// <summary>
-        /// Gets the last absolute acceleration reading, in m/s^2.
-        /// </summary>
-        /// <value>The acceleration.</value>
-        public Vector3 Acceleration
-        {
-            get
-            {
-                CheckDisposed();
-                return NativeMethods.GetAcceleration(instance);
-            }
-        }
-
-        /// <summary>
-        /// Gets the last angular velocity reading, in rad/s.
-        /// </summary>
-        /// <value>The angular velocity.</value>
-        public Vector3 AngularVelocity
-        {
-            get
-            {
-                CheckDisposed();
-                return NativeMethods.GetAngularVelocity(instance);
-            }
-        }
-
+            
         /// <summary>
         /// Gets the x-coordinate of the Oculus Rift display device,
         /// in global desktop coordinates (px).
@@ -281,6 +237,104 @@ namespace OpenTK
             }
         }
 
+        #region Sensor Fusion
+
+        /// <summary>
+        /// Gets a <see cref="OpenTK.Quaternion"/> representing
+        /// the current accumulated orientation. Most applications
+        /// will want to use <see cref="PredictedOrientation"/> instead.
+        /// Use <see cref="OpenTK.Quaternion.ToAxisAngle()"/> to
+        /// convert this quaternion to an axis-angle representation.
+        /// Use <see cref="OpenTK.Matrix4.CreateFromQuaternion(OpenTK.Quaternion)"/>
+        /// to convert this quaternion to a rotation matrix.
+        /// </summary>
+        public Quaternion Orientation
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetOrientation(instance);
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="OpenTK.Quaternion"/> representing
+        /// the predicted orientation after <see cref="PredictionDelta"/>
+        /// seconds.
+        /// </summary>
+        public Quaternion PredictedOrientation
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetPredictedOrientation(instance);
+            }
+        }
+
+        /// <summary>
+        /// Gets the last absolute acceleration reading, in m/s^2.
+        /// </summary>
+        /// <value>The acceleration.</value>
+        public Vector3 Acceleration
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetAcceleration(instance);
+            }
+        }
+
+        /// <summary>
+        /// Gets the last angular velocity reading, in rad/s.
+        /// </summary>
+        /// <value>The angular velocity.</value>
+        public Vector3 AngularVelocity
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetAngularVelocity(instance);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the delta time for sensor prediction, in seconds.
+        /// </summary>
+        public float PredictionDelta
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.GetPredictionDelta(instance);
+            }
+            set
+            {
+                CheckDisposed();
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException();
+                NativeMethods.SetPrediction(instance, value, IsPredictionEnabled ? 1 : 0);
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether sensor prediction is enabled.
+        /// </summary>
+        public bool IsPredictionEnabled
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.IsPredictionEnabled(instance) != 0;
+            }
+            set
+            {
+                CheckDisposed();
+                NativeMethods.SetPredictionEnabled(instance, value ? 1 : 0);
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Private Members
@@ -365,18 +419,6 @@ namespace OpenTK
             public static extern bool IsConnected(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetOrientation")]
-            public static extern Quaternion GetOrientation(OVR_Instance inst);
-
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetAcceleration")]
-            public static extern Vector3 GetAcceleration(OVR_Instance inst);
-
-            [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetAngularVelocity")]
-            public static extern Vector3 GetAngularVelocity(OVR_Instance inst);
-
-            [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetHScreenSize")]
             public static extern float GetHScreenSize(OVR_Instance inst);
 
@@ -423,6 +465,42 @@ namespace OpenTK
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetChromaAbCorrection")]
             public static extern Vector4 GetChromaAbCorrection(OVR_Instance inst);
+
+            #region Sensor Fusion
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetOrientation")]
+            public static extern Quaternion GetOrientation(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetPredictedOrientation")]
+            public static extern Quaternion GetPredictedOrientation(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetAcceleration")]
+            public static extern Vector3 GetAcceleration(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetAngularVelocity")]
+            public static extern Vector3 GetAngularVelocity(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_GetPredictionDelta")]
+            public static extern float GetPredictionDelta(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_SetPrediction")]
+            public static extern void SetPrediction(OVR_Instance inst, float dt, int enable);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_SetPredictionEnabled")]
+            public static extern void SetPredictionEnabled(OVR_Instance inst, int enable);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_IsPredictionEnabled")]
+            public static extern int IsPredictionEnabled(OVR_Instance inst);
+
+            #endregion
         }
 
         #endregion

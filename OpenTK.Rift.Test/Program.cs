@@ -48,7 +48,10 @@ namespace OpenTK.Rift.Test
                 .FirstOrDefault()) ??
             DisplayDevice.Default;
 
-        readonly OculusCamera Camera = new OculusCamera(Rift);
+        readonly OculusCamera Camera = new OculusCamera(
+            Rift,
+            new Vector3(0, 1.6f, 5f),
+            Quaternion.Identity);
 
         float angle;
 
@@ -56,10 +59,11 @@ namespace OpenTK.Rift.Test
             : base(
                 RiftDisplay.Width,
                 RiftDisplay.Height,
-                new GraphicsMode(32, 24, 8, 16),
+                new GraphicsMode(32, 24, 0, 16),
                 "OpenTK Oculus Rift Test",
-                //GameWindowFlags.Fullscreen,
-                GameWindowFlags.Default,
+                //Rift.IsConnected ? 
+                //    GameWindowFlags.Fullscreen :
+                    GameWindowFlags.Default,
                 RiftDisplay)
         {
         }
@@ -87,9 +91,20 @@ namespace OpenTK.Rift.Test
                 Close();
             }
 
-            Camera.Position = new Vector3(0, 1.8f, 5.0f);
+            angle += 16 * (float)TargetUpdatePeriod;
 
-            angle += (float)TargetUpdatePeriod;
+            if (Keyboard[Key.Right])
+                half_ipd *= 1.01f;
+            if (Keyboard[Key.Left])
+                half_ipd *= 0.99f;
+            if (Keyboard[Key.Down])
+                Camera.Position = Vector3.Multiply(Camera.Position, new Vector3(1, 1, 1.01f));
+            if (Keyboard[Key.Up])
+                Camera.Position = Vector3.Multiply(Camera.Position, new Vector3(1, 1, 0.99f));
+            if (Keyboard[Key.BracketLeft])
+                Rift.PredictionDelta *= 0.99f;
+            if (Keyboard[Key.BracketRight])
+                Rift.PredictionDelta *= 1.01f;
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -106,20 +121,20 @@ namespace OpenTK.Rift.Test
 
         #region Private Members
 
+        float half_ipd = Rift.InterpupillaryDistance * 0.5f;
         void DrawScene(CameraType camera_type)
         {
-            Matrix4 projection;
-            Matrix4 modelview;
+            Matrix4 matrix;
 
             SetupViewport(camera_type);
 
-            Camera.GetProjectionMatrix(camera_type, out projection);
+            Camera.GetProjectionMatrix(camera_type, out matrix);
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref projection);
+            GL.LoadMatrix(ref matrix);
 
+            Camera.GetModelviewMatrix(camera_type, out matrix);
             GL.MatrixMode(MatrixMode.Modelview);
-            Camera.GetModelviewMatrix(camera_type, out modelview);
-            GL.LoadMatrix(ref modelview);
+            GL.LoadMatrix(ref matrix);
 
             GL.Rotate(angle, 0.0f, 1.0f, 0.0f);
             DrawCube();
@@ -189,7 +204,7 @@ namespace OpenTK.Rift.Test
 
         #endregion
 
-        #region public static void Main()
+        #region Main
 
         /// <summary>
         /// Entry point of this example.

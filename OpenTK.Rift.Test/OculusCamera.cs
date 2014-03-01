@@ -47,6 +47,7 @@ namespace OpenTK.Rift.Test
         Matrix4 right_frustum = Matrix4.Identity;
         Matrix4 left_modelview = Matrix4.Identity;
         Matrix4 right_modelview = Matrix4.Identity;
+        Quaternion nonrift_orientation = Quaternion.Identity;
         float ZNear = 0.3f;
         float ZFar = 1000.0f;
 
@@ -75,14 +76,14 @@ namespace OpenTK.Rift.Test
                     0;
 
                 GetProjectionMatrix(out mono_frustum);
-                left_frustum = Matrix4.CreateTranslation(projection_center_offset * 0.5f, 0, 0) * mono_frustum;
-                right_frustum = Matrix4.CreateTranslation(-projection_center_offset * 0.5f, 0, 0) * mono_frustum;
+                left_frustum = mono_frustum * Matrix4.CreateTranslation(projection_center_offset, 0, 0);
+                right_frustum = mono_frustum * Matrix4.CreateTranslation(-projection_center_offset, 0, 0);
 
                 float half_ipd = rift.InterpupillaryDistance * 0.5f;
                 if (view_center != 0)
                 {
-                    left_modelview = Matrix4.CreateTranslation(half_ipd, 0, 0) * view_center;
-                    right_modelview = Matrix4.CreateTranslation(-half_ipd, 0, 0) * view_center;
+                    left_modelview = Matrix4.CreateTranslation(half_ipd * view_center, 0, 0);
+                    right_modelview = Matrix4.CreateTranslation(-half_ipd * view_center, 0, 0);
                 }
             };
 
@@ -97,8 +98,6 @@ namespace OpenTK.Rift.Test
 
         #endregion
 
-        #region Public Members
-
         #region Events
 
         public event EventHandler<EventArgs> InterocularDistanceChanged = delegate { };
@@ -110,7 +109,11 @@ namespace OpenTK.Rift.Test
 
         public Vector3 Position { get; set; }
         public Vector3 TargetPosition { get; set; }
-        public Quaternion Orientation { get; set; }
+        public Quaternion Orientation
+        {
+            get { return nonrift_orientation * Quaternion.Conjugate(rift.PredictedOrientation); }
+            set { nonrift_orientation = value; }
+        }
         public Quaternion TargetOrientation { get; set; }
 
         public float AspectRatio
@@ -140,7 +143,7 @@ namespace OpenTK.Rift.Test
                 }
                 else
                 {
-                    return 45;
+                    return MathHelper.PiOver4;
                 }
             }
         }
@@ -183,7 +186,7 @@ namespace OpenTK.Rift.Test
         void GetProjectionMatrix(out Matrix4 matrix)
         {
             matrix = Matrix4.CreatePerspectiveFieldOfView(
-                (float)(FieldOfView * Math.PI / 180.0),
+                FieldOfView,
                 AspectRatio,
                 ZNear,
                 ZFar);
@@ -225,6 +228,9 @@ namespace OpenTK.Rift.Test
         public void GetModelviewMatrix(CameraType type, out Matrix4 matrix)
         {
             this.GetModelviewMatrix(out matrix);
+            Console.WriteLine(matrix);
+            Console.WriteLine(left_modelview);
+            Console.WriteLine(right_modelview);
 
             switch (type)
             {
@@ -257,8 +263,6 @@ namespace OpenTK.Rift.Test
         {
             this.GetRotationMatrix(out matrix);
         }
-
-        #endregion
 
         #endregion
     }

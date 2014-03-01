@@ -174,30 +174,6 @@ int OVR_IsConnected(OVR_Instance *inst)
     return inst && inst->Info;
 }
 
-OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)
-{
-    return
-        inst && inst->Fusion ?
-        quat_to_quat(inst->Fusion->GetOrientation()) :
-        (OVR_Quaternion){ 0 };
-}
-
-OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst)
-{
-    return
-        inst && inst->Fusion ?
-        vec3_to_vec3(inst->Fusion->GetAcceleration()) :
-        (OVR_Vector3){ 0 };
-}
-
-OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst)
-{
-    return
-        inst && inst->Fusion ?
-        vec3_to_vec3(inst->Fusion->GetAngularVelocity()) :
-        (OVR_Vector3){ 0 };
-}
-
 float OVR_GetHScreenSize(OVR_Instance *inst)
 {
     return
@@ -292,4 +268,70 @@ OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst)
         inst && inst->Info ?
         float4_to_vec4(inst->Info->ChromaAbCorrection) :
         (OVR_Vector4){ 0 };
+}
+
+
+// Sensor Fusion
+OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)
+{
+    return
+        inst && inst->Fusion ?
+        quat_to_quat(inst->Fusion->GetOrientation()) :
+        (OVR_Quaternion){ 0, 0, 0, 1 };
+}
+
+OVR_Quaternion OVR_GetPredictedOrientation(OVR_Instance *inst)
+{
+    return
+        inst && inst->Fusion ?
+        quat_to_quat(inst->Fusion->GetPredictedOrientation()) :
+        (OVR_Quaternion){ 0, 0, 0, 1 };
+}
+
+OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst)
+{
+    return
+        inst && inst->Fusion ?
+        vec3_to_vec3(inst->Fusion->GetAcceleration()) :
+        (OVR_Vector3){ 0 };
+}
+
+OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst)
+{
+    return
+        inst && inst->Fusion ?
+        vec3_to_vec3(inst->Fusion->GetAngularVelocity()) :
+        (OVR_Vector3){ 0 };
+}
+
+float OVR_GetPredictionDelta(OVR_Instance *inst)
+{
+    return
+        inst && inst->Fusion ?
+        inst->Fusion->GetPredictionDelta() :
+        0;
+}
+
+void OVR_SetPrediction(OVR_Instance *inst, float dt, int enable)
+{
+    if (inst && inst->Fusion)
+    {
+        inst->Fusion->SetPrediction(dt, enable != 0);
+    }
+}
+
+void OVR_SetPredictionEnabled(OVR_Instance *inst, int enable)
+{
+    if (inst && inst->Fusion)
+    {
+        inst->Fusion->SetPredictionEnabled(enable != 0);
+    }
+}
+
+int OVR_IsPredictionEnabled(OVR_Instance *inst)
+{
+    return
+        inst && inst->Fusion ?
+        inst->Fusion->IsPredictionEnabled() :
+        0;
 }
