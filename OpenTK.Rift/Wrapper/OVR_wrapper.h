@@ -50,6 +50,7 @@ extern "C"
     void OVR_Shutdown();
     OVR_Instance* OVR_Create();
     void OVR_Destroy(OVR_Instance *inst);
+    int OVR_IsConnected(OVR_Instance *inst);
     OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);
     OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst);
     OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst);

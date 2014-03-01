@@ -154,15 +154,24 @@ OVR_Instance* OVR_Create()
 
 void OVR_Destroy(OVR_Instance *inst)
 {
-    assert(inst);
-    delete inst->Fusion;
-    delete inst->Sensor;
-    delete inst->Device;
-    delete inst->Info;
-    inst->Fusion = NULL;
-    inst->Sensor = NULL;
-    inst->Device = NULL;
-    inst->Info = NULL;
+    if (inst)
+    {
+        delete inst->Fusion;
+        delete inst->Sensor;
+        delete inst->Device;
+        delete inst->Info;
+        inst->Fusion = NULL;
+        inst->Sensor = NULL;
+        inst->Device = NULL;
+        inst->Info = NULL;
+    }
+    delete inst;
+    inst = NULL;
+}
+
+int OVR_IsConnected(OVR_Instance *inst)
+{
+    return inst && inst->Info;
 }
 
 OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)

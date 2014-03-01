@@ -67,6 +67,19 @@ namespace OpenTK
         #region Public Members
 
         /// <summary>
+        /// Gets a value indicating whether this instance is connected
+        /// to an Oculus Rift device.
+        /// </summary>
+        public bool IsConnected
+        {
+            get
+            {
+                CheckDisposed();
+                return NativeMethods.IsConnected(instance);
+            }
+        }
+
+        /// <summary>
         /// Gets a <see cref="OpenTK.Quaternion"/> representing
         /// the current accumulated orientation.
         /// Use <see cref="OpenTK.Quaternion.ToAxisAngle()"/> to
@@ -346,6 +359,10 @@ namespace OpenTK
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_Destroy")]
             public static extern OVR_Instance Destroy(OVR_Instance inst);
+
+            [SuppressUnmanagedCodeSecurity]
+            [DllImport(lib, EntryPoint = "OVR_IsConnected")]
+            public static extern bool IsConnected(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_GetOrientation")]
