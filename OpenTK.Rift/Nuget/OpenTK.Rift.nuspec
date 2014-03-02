@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>OpenTK.Rift</id>
+        <version>$version$</version>
+        <authors>Stefanos Apostolopoulos</authors>
+        <owners>Stefanos Apostolopoulos</owners>
+        <licenseUrl>http://www.opentk.com/project/license</licenseUrl>
+        <projectUrl>https://github.com/opentk/rift</projectUrl>
+        <iconUrl>file:///./logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <summary>
+OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK.
+        </summary>
+        <description>
+OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK.
+
+Features
+- Create great Oculus Rift applications from the comfort of C#, F# and VB.Net
+- Increase your reach: support for Windows, Linux and Mac OS X
+- Break the limits: leverage the full power of OpenGL 4.4, OpenCL and OpenAL
+- Code faster: avoid the pitfalls of C++ memory management
+
+Home page: http://www.opentk.com
+Official repository: https://github.com/opentk/rift
+        </description>
+        <releaseNotes>
+            http://www.opentk.com/news
+        </releaseNotes>
+        <copyright>Copyright 2014 Stefanos Apostolopoulos</copyright>
+        <tags>OpenTK Oculus Rift C# F# VB .Net Mono</tags>
+        <references>
+            <reference file="OpenTK.Rift.dll" />
+        </references>
+        <frameworkAssemblies>
+        </frameworkAssemblies>
+	</metadata>
+    <files>
+        <file src="obj/OpenTK.Rift.dll" target="lib/net40" />
+        <file src="obj/OpenTK.Rift.xml" target="lib/net40" />
+        <file src="obj/OpenTK.Rift.dll.config" target="content" />
+    </files>
+</package>
