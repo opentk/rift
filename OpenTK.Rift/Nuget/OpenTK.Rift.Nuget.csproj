@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{ADC34399-7613-44D2-90B2-19250F12FE7B}</ProjectGuid>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <OutputPath>.\obj\</OutputPath>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{ADC34399-7613-44D2-90B2-19250F12FE7B}</ProjectGuid>
+    <OutputPath>.\obj\</OutputPath>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Exe</OutputType>
@@ -60,7 +59,7 @@
   <Target Name="Build">
     <MakeDir Directories="$(OutputPath)" />
     <!-- Copy built files to the tree format expected by nuget -->
-    <CreateItem Include="$(OutputPath)../../../bin/$(Platform)/$(Configuration)/**">
+    <CreateItem Include="../../bin/$(Platform)/$(Configuration)/*">
       <Output TaskParameter="Include" ItemName="Binaries" />
     </CreateItem>
     <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)" />
