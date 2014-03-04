@@ -50,9 +50,12 @@ namespace Build.UpdateVersion
                 args[1] :
                 Path.GetFileName(args[0]);
 
-            using (WebClient Client = new WebClient())
+            if (!File.Exists(path))
             {
-                Client.DownloadFile(url, path);
+                using (WebClient Client = new WebClient())
+                {
+                    Client.DownloadFile(url, path);
+                }
             }
         }
     }
