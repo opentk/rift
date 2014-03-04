@@ -1,5 +1,4 @@
 # Ignores specific to OpenTK.Rift
-build/
 *.userprefs
 *.cmake
 *.nupkg
