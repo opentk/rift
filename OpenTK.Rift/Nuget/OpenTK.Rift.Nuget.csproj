@@ -15,7 +15,7 @@
     <DownloadNuget Condition="$(OS) != 'Windows_NT'">mono $(DownloadNugetPath) $(DownloadNugetArgs)</DownloadNuget>
     <DownloadNuget Condition="$(OS) == 'Windows_NT'">$(DownloadNugetPath) $(DownloadNugetArgs)</DownloadNuget>
     <ExecuteNuget Condition="$(OS) != 'Windows_NT'">
-      mono -- runtime=v4.0 $(OutputPath)NuGet.exe $(NugetArgs)
+      mono --runtime=v4.0 $(OutputPath)NuGet.exe $(NugetArgs)
     </ExecuteNuget>
     <ExecuteNuget Condition="$(OS) == 'Windows_NT'">
       $(OutputPath)NuGet.exe $(NugetArgs)
