@@ -36,12 +36,6 @@ namespace Build.UpdateVersion
 {
     class Program
     {
-        const string Major = "1";
-        const string Minor = "1";
-
-        static string RootDirectory;
-        static string SourceDirectory;
-
         public static void Main(string[] args)
         {
             if (args.Length == 0 || args.Length > 2)
