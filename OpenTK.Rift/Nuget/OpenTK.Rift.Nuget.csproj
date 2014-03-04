@@ -53,7 +53,7 @@
     <ReadLinesFromFile File="../../../Version.txt">
       <Output TaskParameter="Lines" ItemName="Version" />
     </ReadLinesFromFile>
-    <Exec Command="echo @(Version)" />
+    <Exec Command="echo Version is: @(Version)" />
     <!-- Execute nuget script -->
     <Exec Command="$(Download) $(DownloadMSBuildArgs)" />
     <Exec Command="$(Download) $(DownloadNugetArgs)" />

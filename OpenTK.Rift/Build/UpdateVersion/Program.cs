@@ -77,8 +77,10 @@ namespace Build.UpdateVersion
             Console.WriteLine("API compatibility key: {0}.{1}", major, minor);
             Console.WriteLine("Build date: {0}", timestamp);
 
+            Console.WriteLine("Writing to {0}", Path.GetFullPath(RootDirectory));
             GenerateTimestamp(timestamp, Path.Combine(RootDirectory, "Timestamp.txt"));
             GenerateVersion(version, Path.Combine(RootDirectory, "Version.txt"));
+
             GenerateAssemblyInfo(major, minor, version, Path.Combine(SourceDirectory, "GlobalAssemblyInfo.cs"));
         }
 
