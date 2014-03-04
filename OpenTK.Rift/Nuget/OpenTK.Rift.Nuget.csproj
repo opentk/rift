@@ -50,7 +50,7 @@
     </CreateItem>
     <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)" />
     <!-- Generate version information -->
-    <ReadLinesFromFile File="../../../Version.txt">
+    <ReadLinesFromFile File="../../Version.txt">
       <Output TaskParameter="Lines" ItemName="Version" />
     </ReadLinesFromFile>
     <Exec Command="echo Version is: @(Version)" />
