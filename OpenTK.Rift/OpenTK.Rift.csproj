@@ -57,6 +57,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
     <Message Text="Building OVR library" Importance="normal" />
+    <Exec Command="if not exist obj/$(Platform)/$(Configuration) mkdir obj/$(Platform)/$(Configuration)" Condition="$(OS) == 'Windows_NT'" />
+    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; msbuild OVR.sln" Condition="$(OS) == 'Windows_NT'" />
     <Exec Command="mkdir -p obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
     <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
   </Target>
