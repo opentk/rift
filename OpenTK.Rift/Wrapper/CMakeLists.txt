@@ -67,6 +67,11 @@ endif ()
 
 add_library(${PROJECT_NAME} SHARED ${SRC})
 
+if (WIN32)
+  target_link_libraries(${PROJECT_NAME} setupapi.lib)
+  target_link_libraries(${PROJECT_NAME} winmm.lib)
+endif ()
+
 if (APPLE)
   find_library(MAC_APPSERVICES NAMES ApplicationServices)
   find_library(MAC_CF NAMES CoreFoundation)
