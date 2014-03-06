@@ -36,6 +36,7 @@ set (SRC ${SRC}
   OVR_wrapper.cpp)
 
 if (WIN32)
+  add_definitions(-DUNICODE -D_UNICODE)
   set (SRC ${SRC}
     ../LibOVR/Src/OVR_Win32_DeviceManager.cpp
     ../LibOVR/Src/OVR_Win32_DeviceStatus.cpp
