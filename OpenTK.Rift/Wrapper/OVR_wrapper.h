@@ -1,4 +1,4 @@
-﻿//
+//
 // OVR_wrapper.h
 //
 // Author:

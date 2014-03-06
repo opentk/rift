@@ -1,4 +1,4 @@
-﻿//
+//
 // OVR_wrapper.cpp
 //
 // Author:
@@ -102,6 +102,30 @@ namespace
         ret.z = v[2];
         ret.w = v[3];
         return ret;
+    }
+
+    inline OVR_Vector4 vec4()
+    {
+        OVR_Vector4 v = { 0 };
+        return v;
+    }
+
+    inline OVR_Vector3 vec3()
+    {
+        OVR_Vector3 v = { 0 };
+        return v;
+    }
+
+    inline OVR_Quaternion quat()
+    {
+        OVR_Quaternion q = { 0 };
+        return q;
+    }
+
+    inline OVR_Quaternion unit_quat()
+    {
+        OVR_Quaternion q = { 0.0f, 0.0f, 0.0f, 1.0f };
+        return q;
     }
 }
 
@@ -259,7 +283,7 @@ OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst)
     return
         inst && inst->Info ?
         float4_to_vec4(inst->Info->DistortionK) :
-        (OVR_Vector4){ 0 };
+        vec4();
 }
 
 OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst)
@@ -267,7 +291,7 @@ OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst)
     return
         inst && inst->Info ?
         float4_to_vec4(inst->Info->ChromaAbCorrection) :
-        (OVR_Vector4){ 0 };
+        vec4();
 }
 
 
@@ -277,7 +301,7 @@ OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst)
     return
         inst && inst->Fusion ?
         quat_to_quat(inst->Fusion->GetOrientation()) :
-        (OVR_Quaternion){ 0, 0, 0, 1 };
+        unit_quat();
 }
 
 OVR_Quaternion OVR_GetPredictedOrientation(OVR_Instance *inst)
@@ -285,7 +309,7 @@ OVR_Quaternion OVR_GetPredictedOrientation(OVR_Instance *inst)
     return
         inst && inst->Fusion ?
         quat_to_quat(inst->Fusion->GetPredictedOrientation()) :
-        (OVR_Quaternion){ 0, 0, 0, 1 };
+        unit_quat();
 }
 
 OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst)
@@ -293,7 +317,7 @@ OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst)
     return
         inst && inst->Fusion ?
         vec3_to_vec3(inst->Fusion->GetAcceleration()) :
-        (OVR_Vector3){ 0 };
+        vec3();
 }
 
 OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst)
@@ -301,7 +325,7 @@ OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst)
     return
         inst && inst->Fusion ?
         vec3_to_vec3(inst->Fusion->GetAngularVelocity()) :
-        (OVR_Vector3){ 0 };
+        vec3();
 }
 
 float OVR_GetPredictionDelta(OVR_Instance *inst)
