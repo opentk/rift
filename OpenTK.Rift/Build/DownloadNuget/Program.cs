@@ -54,8 +54,13 @@ namespace Build.UpdateVersion
             {
                 using (WebClient Client = new WebClient())
                 {
+                    Console.WriteLine("Downloading file {0} from {1} to {2}", Path.GetFileName(args[0]), url, path);
                     Client.DownloadFile(url, path);
                 }
+            }
+            else
+            {
+                Console.WriteLine("File {0} exists. Skipping download.", path);
             }
         }
     }
