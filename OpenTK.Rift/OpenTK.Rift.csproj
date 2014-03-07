@@ -11,9 +11,9 @@
     <AssemblyName>OpenTK.Rift</AssemblyName>
     <!-- CMake invocation -->
     <CMakeArgs>-DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
-    <CMake>(cmake $(CMakeArgs) || /usr/bin/cmake $(CMakeArgs) || /usr/local/bin/cmake $(CMakeArgs))</CMake>
-    <CMakeInstallArgs>--build . --target install</CMakeInstallArgs>
-    <CMakeInstall>(cmake $(CMakeInstallArgs) || /usr/bin/cmake $(CMakeInstallArgs) || /usr/local/bin/cmake $(CMakeInstallArgs))</CMakeInstall>
+    <CMakeInstallArgs>--build . --config $(Configuration) --target install</CMakeInstallArgs>
+    <CMake>cmake $(CMakeGenerator) $(CMakeArgs)</CMake>
+    <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
