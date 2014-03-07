@@ -35,6 +35,7 @@ Official repository: https://github.com/opentk/rift
         </dependencies>
   </metadata>
     <files>
-      <file src="obj/lib/**" target="lib/net40/lib" />
+      <file src="obj/lib/x86/OVR.dll" target="lib/net40/lib/x86" />
+      <file src="obj/lib/x64/OVR.dll" target="lib/net40/lib/x64" />
     </files>
 </package>

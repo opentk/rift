@@ -21,6 +21,12 @@ Features
 - Break the limits: leverage the full power of OpenGL 4.4, OpenCL and OpenAL
 - Code faster: avoid the pitfalls of C++ memory management
 
+To use OpenTK.Rift, you also need to install at least one of the following
+NuGet packages:
+- OpenTK.Rift.Linux
+- OpenTK.Rift.Mac
+- OpenTK.Rift.Windows
+
 Home page: http://www.opentk.com
 Official repository: https://github.com/opentk/rift
         </description>
