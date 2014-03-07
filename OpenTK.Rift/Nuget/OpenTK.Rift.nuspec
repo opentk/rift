@@ -34,7 +34,10 @@ Official repository: https://github.com/opentk/rift
         </references>
         <frameworkAssemblies>
         </frameworkAssemblies>
-	</metadata>
+        <dependencies>
+          <dependency id="OpenTK" version="1.1" />
+        </dependencies>
+  </metadata>
     <files>
         <file src="obj/OpenTK.Rift.dll" target="lib/net40" />
         <file src="obj/OpenTK.Rift.xml" target="lib/net40" />
