@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 project(OVR)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../LibOVR)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../LibOVR/Include)
@@ -66,6 +67,13 @@ if (APPLE)
 endif ()
 
 add_library(${PROJECT_NAME} SHARED ${SRC})
+message("Installing to: ${INSTALL_LOCATION}")
+install(
+  TARGETS ${PROJECT_NAME}
+  ARCHIVE DESTINATION ${INSTALL_LOCATION}
+  LIBRARY DESTINATION ${INSTALL_LOCATION}
+  RUNTIME DESTINATION ${INSTALL_LOCATION}
+  COMPONENT Library)
 
 if (WIN32)
   target_link_libraries(${PROJECT_NAME} setupapi.lib)

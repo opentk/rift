@@ -10,8 +10,10 @@
     <RootNamespace>OpenTK.Rift</RootNamespace>
     <AssemblyName>OpenTK.Rift</AssemblyName>
     <!-- CMake invocation -->
-    <CMakeArgs>-DCMAKE_BUILD_TYPE=$(Configuration) -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=../../../../bin/$(Platform)/$(Configuration) --build ../../../Wrapper</CMakeArgs>
+    <CMakeArgs>-DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
     <CMake>(cmake $(CMakeArgs) || /usr/bin/cmake $(CMakeArgs) || /usr/local/bin/cmake $(CMakeArgs))</CMake>
+    <CMakeInstallArgs>--build . --target install</CMakeInstallArgs>
+    <CMakeInstall>(cmake $(CMakeInstallArgs) || /usr/bin/cmake $(CMakeInstallArgs) || /usr/local/bin/cmake $(CMakeInstallArgs))</CMakeInstall>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
@@ -58,9 +60,8 @@
   <Target Name="BeforeBuild">
     <Message Text="Building OVR library" Importance="normal" />
     <Exec Command="IF NOT EXIST obj\$(Platform)\$(Configuration)\NUL mkdir obj\$(Platform)\$(Configuration)" Condition="$(OS) == 'Windows_NT'" />
-    <Exec Command="cd obj\$(Platform)\$(Configuration) &amp;&amp; $(CMake) &amp;&amp; msbuild OVR.sln" Condition="$(OS) == 'Windows_NT'" />
     <Exec Command="mkdir -p obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
-    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; $(CMakeInstall)" />
   </Target>
   <Target Name="BeforeClean">
     <Message Text="Cleaning OVR library" Importance="Normal" />
