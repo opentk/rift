@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+    <metadata>
+        <id>OpenTK.Rift.Mac</id>
+        <version>$version$</version>
+        <authors>Stefanos Apostolopoulos</authors>
+        <owners>Stefanos Apostolopoulos</owners>
+        <licenseUrl>http://www.opentk.com/project/license</licenseUrl>
+        <projectUrl>https://github.com/opentk/rift</projectUrl>
+        <iconUrl>file:///./logo.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <summary>
+OpenTK.Rift.Mac adds Mac OS X support to OpenTK.Rift.
+        </summary>
+        <description>
+OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK.
+
+OpenTK.Rift.Mac contains the native libraries required to connect to an
+Oculus Rift device on Mac OS X.
+
+Home page: http://www.opentk.com
+Official repository: https://github.com/opentk/rift
+        </description>
+        <releaseNotes>
+            http://www.opentk.com/news
+        </releaseNotes>
+        <copyright>Copyright 2014 Stefanos Apostolopoulos</copyright>
+        <tags>OpenTK Oculus Rift C# F# VB .Net Mono</tags>
+        <references>
+        </references>
+        <frameworkAssemblies>
+        </frameworkAssemblies>
+        <dependencies>
+          <dependency id="OpenTK.Rift" version="1.0" />
+        </dependencies>
+  </metadata>
+    <files>
+      <file src="obj/lib/**" target="lib/net40/lib" />
+    </files>
+</package>
