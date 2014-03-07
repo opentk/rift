@@ -15,7 +15,7 @@
     <CMakeGenerator Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'AnyCPU'">-G"Visual Studio $(VSVersion) Win64"</CMakeGenerator>
     <CMakeGenerator Condition="'$(OS)' != 'Windows_NT'"></CMakeGenerator>
     <CMakeArgs>$(CMakeGenerator) -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
-    <CMakeInstallArgs>--build . --config $(Configuration) --target install</CMakeInstallArgs>
+    <CMakeInstallArgs>--build . --clean-first --config $(Configuration) --target install</CMakeInstallArgs>
     <CMake>cmake $(CMakeGenerator) $(CMakeArgs)</CMake>
     <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
