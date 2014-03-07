@@ -31,10 +31,20 @@
   <Target Name="Build">
     <MakeDir Directories="$(OutputPath)" />
     <!-- Copy built files to the tree format expected by nuget -->
-    <CreateItem Include="../../bin/$(Configuration)/**">
+    <!-- xbuild 2.8 does not support %(RecursiveDir) so we need
+    to do this the hard way -->
+    <CreateItem Include="../../bin/$(Configuration)/*">
       <Output TaskParameter="Include" ItemName="Binaries" />
     </CreateItem>
-    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)%(RecursiveDir)" />
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)" />
+    <CreateItem Include="../../bin/$(Configuration)/lib/x86/*">
+      <Output TaskParameter="Include" ItemName="Binaries" />
+    </CreateItem>
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)lib/x86" />
+    <CreateItem Include="../../bin/$(Configuration)/lib/x64/*">
+      <Output TaskParameter="Include" ItemName="Binaries" />
+    </CreateItem>
+    <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)/lib/x64" />
     <!-- Generate version information -->
     <ReadLinesFromFile File="../../Version.txt">
       <Output TaskParameter="Lines" ItemName="Version" />
