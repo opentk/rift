@@ -1,4 +1,6 @@
 * text eol=auto
+*.cpp text
+*.h text
 *.fs text
 *.cs text
 *.fsproj text

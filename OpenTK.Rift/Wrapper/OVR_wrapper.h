@@ -1,4 +1,4 @@
-﻿//
+//
 // OVR_wrapper.h
 //
 // Author:
@@ -28,6 +28,12 @@
 #ifndef OPENTK_RIFT_OVR_H
 #define OPENTK_RIFT_OVR_H
 
+#if _WIN32
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT
+#endif
+
 extern "C"
 {
     struct OVR_Instance;
@@ -46,33 +52,33 @@ extern "C"
         float x, y, z, w;
     } OVR_Vector4;
 
-    void OVR_Init();
-    void OVR_Shutdown();
-    OVR_Instance* OVR_Create();
-    void OVR_Destroy(OVR_Instance *inst);
-    int OVR_IsConnected(OVR_Instance *inst);
-    OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst);
-    OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst);
-    int OVR_GetDesktopX(OVR_Instance *inst);
-    int OVR_GetDesktopY(OVR_Instance *inst);
-    int OVR_GetHResolution(OVR_Instance *inst);
-    int OVR_GetVResolution(OVR_Instance *inst);
-    float OVR_GetHScreenSize(OVR_Instance *inst);
-    float OVR_GetVScreenSize(OVR_Instance *inst);
-    float OVR_GetVScreenCenter(OVR_Instance *inst);
-    float OVR_GetEyeToScreenDistance(OVR_Instance *inst);
-    float OVR_GetLensSeparationDistance(OVR_Instance *inst);
-    float OVR_GetInterpupillaryDistance(OVR_Instance *inst);
+    EXPORT void OVR_Init();
+    EXPORT void OVR_Shutdown();
+    EXPORT OVR_Instance* OVR_Create();
+    EXPORT void OVR_Destroy(OVR_Instance *inst);
+    EXPORT int OVR_IsConnected(OVR_Instance *inst);
+    EXPORT OVR_Vector4 OVR_GetDistortionK(OVR_Instance *inst);
+    EXPORT OVR_Vector4 OVR_GetChromaAbCorrection(OVR_Instance *inst);
+    EXPORT int OVR_GetDesktopX(OVR_Instance *inst);
+    EXPORT int OVR_GetDesktopY(OVR_Instance *inst);
+    EXPORT int OVR_GetHResolution(OVR_Instance *inst);
+    EXPORT int OVR_GetVResolution(OVR_Instance *inst);
+    EXPORT float OVR_GetHScreenSize(OVR_Instance *inst);
+    EXPORT float OVR_GetVScreenSize(OVR_Instance *inst);
+    EXPORT float OVR_GetVScreenCenter(OVR_Instance *inst);
+    EXPORT float OVR_GetEyeToScreenDistance(OVR_Instance *inst);
+    EXPORT float OVR_GetLensSeparationDistance(OVR_Instance *inst);
+    EXPORT float OVR_GetInterpupillaryDistance(OVR_Instance *inst);
 
     // Sensor Fusion
-    OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);
-    OVR_Quaternion OVR_GetPredictedOrientation(OVR_Instance *inst);
-    OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst);
-    OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst);
-    float OVR_GetPredictionDelta(OVR_Instance *inst);
-    void OVR_SetPrediction(OVR_Instance *inst, float dt, int enable);
-    void OVR_SetPredictionEnabled(OVR_Instance *inst, int enable);
-    int OVR_IsPredictionEnabled(OVR_Instance *inst);
+    EXPORT OVR_Quaternion OVR_GetOrientation(OVR_Instance *inst);
+    EXPORT OVR_Quaternion OVR_GetPredictedOrientation(OVR_Instance *inst);
+    EXPORT OVR_Vector3 OVR_GetAcceleration(OVR_Instance *inst);
+    EXPORT OVR_Vector3 OVR_GetAngularVelocity(OVR_Instance *inst);
+    EXPORT float OVR_GetPredictionDelta(OVR_Instance *inst);
+    EXPORT void OVR_SetPrediction(OVR_Instance *inst, float dt, int enable);
+    EXPORT void OVR_SetPredictionEnabled(OVR_Instance *inst, int enable);
+    EXPORT int OVR_IsPredictionEnabled(OVR_Instance *inst);
 }
 
 #endif

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,8 +10,16 @@
     <RootNamespace>OpenTK.Rift</RootNamespace>
     <AssemblyName>OpenTK.Rift</AssemblyName>
     <!-- CMake invocation -->
-    <CMakeArgs>-DCMAKE_BUILD_TYPE=$(Configuration) -DCMAKE_LIBRARY_OUTPUT_DIRECTORY=../../../../bin/$(Platform)/$(Configuration) --build ../../../Wrapper</CMakeArgs>
-    <CMake>(cmake $(CMakeArgs) || /usr/bin/cmake $(CMakeArgs) || /usr/local/bin/cmake $(CMakeArgs))</CMake>
+    <VSVersion>$(VisualStudioVersion.Substring(0,$(VisualStudioVersion.IndexOf('.'))))</VSVersion>
+    <CMakeExtraArgs Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'x86'">-G"Visual Studio $(VSVersion)" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs>
+    <CMakeExtraArgs Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'AnyCPU'">-G"Visual Studio $(VSVersion) Win64" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs>
+    <CMakeExtraArgs Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs>
+    <CMakeArgs>$(CMakeExtraArgs) -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
+    <CMakeInstallArgs>--build . --clean-first --config $(Configuration) --target install</CMakeInstallArgs>
+    <CMake>cmake $(CMakeGenerator) $(CMakeArgs)</CMake>
+    <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,6 +42,7 @@
     <DocumentationFile>..\bin\x86\Release\OpenTK.Rift.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -54,8 +63,9 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
     <Message Text="Building OVR library" Importance="normal" />
+    <Exec Command="IF NOT EXIST obj\$(Platform)\$(Configuration)\NUL mkdir obj\$(Platform)\$(Configuration)" Condition="$(OS) == 'Windows_NT'" />
     <Exec Command="mkdir -p obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
-    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; make -j" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; $(CMakeInstall)" />
   </Target>
   <Target Name="BeforeClean">
     <Message Text="Cleaning OVR library" Importance="Normal" />
@@ -80,11 +90,10 @@
   </ProjectExtensions>
   <ItemGroup>
     <Compile Include="OculusRift.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Wrapper\" />
-    <Folder Include="LibOVR\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Wrapper\CMakeLists.txt" />
     <None Include="Wrapper\OVR_wrapper.cpp" />
@@ -192,5 +201,6 @@
     <Reference Include="OpenTK">
       <HintPath>..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
 </Project>

@@ -4,36 +4,22 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{ADC34399-7613-44D2-90B2-19250F12FE7B}</ProjectGuid>
-    <OutputPath>.\obj\</OutputPath>
+    <OutputPath>$(MSBuildProjectDirectory)\obj\</OutputPath>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Exe</OutputType>
     <AssemblyName>OpenTK.Rift.Nuget</AssemblyName>
     <NugetArgs>pack OpenTK.Rift.nuspec -Version @(Version) -OutputDirectory $(OutputPath)</NugetArgs>
-    <DownloadNuget>
-    (
-      cd $(OutputPath)
-      (
-        wget -nc http://build.nuget.org/NuGet.exe ||
-        curl -L -O http://build.nuget.org/NuGet.exe
-      )
-      (
-        wget -nc https://dl.dropboxusercontent.com/u/30682604/Microsoft.Build.dll ||
-        curl -L -O https://dl.dropboxusercontent.com/u/30682604/Microsoft.Build.dll
-      )
-      cd ..
-    )
-    </DownloadNuget>
-    <ExecuteNuget>
-    (
-        (
-          nuget $(NugetArgs)
-        ) ||
-        (
-          $(DownloadNuget)
-          mono --runtime=v4.0 $(OutputPath)NuGet.exe $(NugetArgs)
-        )
-    )
+    <DownloadMSBuildArgs>https://dl.dropboxusercontent.com/u/30682604/Microsoft.Build.dll $(OutputPath)Microsoft.Build.dll</DownloadMSBuildArgs>
+    <DownloadNugetArgs>http://build.nuget.org/NuGet.exe $(OutputPath)NuGet.exe</DownloadNugetArgs>
+    <DownloadUtility>..\..\bin\$(Platform)\$(Configuration)\Tools\Build.DownloadNuget.exe</DownloadUtility>
+    <Download Condition="$(OS) != 'Windows_NT'">mono $(DownloadUtility)</Download>
+    <Download Condition="$(OS) == 'Windows_NT'">$(DownloadUtility)</Download>
+    <ExecuteNuget Condition="$(OS) != 'Windows_NT'">
+      mono --runtime=v4.0 $(OutputPath)NuGet.exe $(NugetArgs)
+    </ExecuteNuget>
+    <ExecuteNuget Condition="$(OS) == 'Windows_NT'">
+      $(OutputPath)NuGet.exe $(NugetArgs)
     </ExecuteNuget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -64,14 +50,14 @@
     </CreateItem>
     <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)" />
     <!-- Generate version information -->
-    <Exec Command="echo 1.0.0.$(git rev-list HEAD --count || 0) > $(OutputPath)Version.txt" />
-    <ReadLinesFromFile File="$(OutputPath)Version.txt">
+    <ReadLinesFromFile File="../../Version.txt">
       <Output TaskParameter="Lines" ItemName="Version" />
     </ReadLinesFromFile>
+    <Exec Command="echo Version is: @(Version)" />
     <!-- Execute nuget script -->
+    <Exec Command="$(Download) $(DownloadMSBuildArgs)" />
+    <Exec Command="$(Download) $(DownloadNugetArgs)" />
     <Exec Command="$(ExecuteNuget)" />
-    <!--<Exec Command="NuGet.exe pack OpenTK.Rift.nuspec -Version @(Version)" Condition="$(OS) == 'Windows_NT'" />
-    <Exec Command="mono -runtime=v4.0 $(OutputPath)NuGet.exe pack OpenTK.Rift.nuspec -Version @(Version) -OutputDirectory $(OutputPath)" Condition="$(OS) != 'Windows_NT'" />-->
     <!-- Copy the nuget archive to the root directory and add a date stamp -->
     <CreateItem Include="$(OutputPath)OpenTK.Rift*.nupkg">
       <Output TaskParameter="Include" ItemName="NugetPackage" />
