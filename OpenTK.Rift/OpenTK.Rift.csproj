@@ -15,8 +15,8 @@
     <CMakeExtraArgs_x64 Condition="'$(OS)' == 'Windows_NT'">-G"Visual Studio $(VSVersion) Win64" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs_x64>
     <CMakeExtraArgs_x86 Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs_x86>
     <CMakeExtraArgs_x64 Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs_x64>
-    <CMakeArgs_x86>$(CMakeExtraArgs_x86) -DPROJECT_NAME=OVR32 -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x86/ ../../../Wrapper</CMakeArgs_x86>
-    <CMakeArgs_x64>$(CMakeExtraArgs_x64) -DPROJECT_NAME=OVR64 -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x64/ ../../../Wrapper</CMakeArgs_x64>
+    <CMakeArgs_x86>$(CMakeExtraArgs_x86) -DPROJECT_NAME=OVR -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x86/ ../../../Wrapper</CMakeArgs_x86>
+    <CMakeArgs_x64>$(CMakeExtraArgs_x64) -DPROJECT_NAME=OVR -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x64/ ../../../Wrapper</CMakeArgs_x64>
     <CMakeInstallArgs>--build . --clean-first --config $(Configuration) --target install</CMakeInstallArgs>
     <CMake_x86>cmake $(CMakeArgs_x86)</CMake_x86>
     <CMake_x64>cmake $(CMakeArgs_x64)</CMake_x64>

@@ -44,6 +44,7 @@ namespace OpenTK
     public class OculusRift : IDisposable
     {
         static int instance_count;
+        static Toolkit opentk;
         OVR_Instance instance;
         bool disposed;
 
@@ -56,6 +57,7 @@ namespace OpenTK
         {
             if (Interlocked.Increment(ref instance_count) == 1)
             {
+                opentk = Toolkit.Init();
                 NativeMethods.Init();
             }
 
@@ -374,6 +376,8 @@ namespace OpenTK
                     if (Interlocked.Decrement(ref instance_count) == 0)
                     {
                         NativeMethods.Shutdown();
+                        opentk.Dispose();
+                        opentk = null;
                     }
                 }
 
@@ -397,6 +401,35 @@ namespace OpenTK
         static class NativeMethods
         {
             const string lib = "OVR";
+
+            static NativeMethods()
+            {
+                if (Configuration.RunningOnWindows &&
+                    !Configuration.RunningOnMono)
+                {
+                    // When running on Windows, we need to load the
+                    // native library into the address space of the
+                    // application. This allows us to use DllImport
+                    // to load the correct (x86 or x64) library at
+                    // runtime.
+                    // Non-windows platforms rely on the dll.config
+                    // file to load the correct library.
+
+                    if (IntPtr.Size == 4)
+                    {
+                        // Running on 32bit system
+                        LoadLibrary("lib/x86/OVR.dll");
+                    }
+                    else
+                    {
+                        // Running on 64bit system
+                        LoadLibrary("lib/x64/OVR.dll");
+                    }
+                }
+            }
+
+            [DllImport("kernel32.dll")]
+            static extern IntPtr LoadLibrary(string filename);
 
             [SuppressUnmanagedCodeSecurity]
             [DllImport(lib, EntryPoint = "OVR_Init")]
