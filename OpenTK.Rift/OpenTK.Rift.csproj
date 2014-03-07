@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}</ProjectGuid>
@@ -11,61 +11,44 @@
     <AssemblyName>OpenTK.Rift</AssemblyName>
     <!-- CMake invocation -->
     <VSVersion>$(VisualStudioVersion.Substring(0,$(VisualStudioVersion.IndexOf('.'))))</VSVersion>
-    <CMakeExtraArgs Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'x86'">-G"Visual Studio $(VSVersion)" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs>
-    <CMakeExtraArgs Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'AnyCPU'">-G"Visual Studio $(VSVersion) Win64" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs>
-    <CMakeExtraArgs Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs>
-    <CMakeArgs>$(CMakeExtraArgs) -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
+    <CMakeExtraArgs_x86 Condition="'$(OS)' == 'Windows_NT'">-G"Visual Studio $(VSVersion)" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs_x86>
+    <CMakeExtraArgs_x64 Condition="'$(OS)' == 'Windows_NT'">-G"Visual Studio $(VSVersion) Win64" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs_x64>
+    <CMakeExtraArgs_x86 Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs_x86>
+    <CMakeExtraArgs_x64 Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs_x64>
+    <CMakeArgs_x86>$(CMakeExtraArgs_x86) -DPROJECT_NAME=OVR32 -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x86/ ../../../Wrapper</CMakeArgs_x86>
+    <CMakeArgs_x64>$(CMakeExtraArgs_x64) -DPROJECT_NAME=OVR64 -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x64/ ../../../Wrapper</CMakeArgs_x64>
     <CMakeInstallArgs>--build . --clean-first --config $(Configuration) --target install</CMakeInstallArgs>
-    <CMake>cmake $(CMakeGenerator) $(CMakeArgs)</CMake>
+    <CMake_x86>cmake $(CMakeArgs_x86)</CMake_x86>
+    <CMake_x64>cmake $(CMakeArgs_x64)</CMake_x64>
     <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\bin\x86\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>..\bin\x86\Debug\OpenTK.Rift.xml</DocumentationFile>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <Optimize>true</Optimize>
-    <OutputPath>..\bin\x86\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>..\bin\x86\Release\OpenTK.Rift.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
-    <OutputPath>..\bin\AnyCPU\Debug</OutputPath>
+    <OutputPath>..\bin\Debug</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\AnyCPU\Debug\OpenTK.Rift.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\OpenTK.Rift.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>DEBUG;</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
-    <OutputPath>..\bin\AnyCPU\Release</OutputPath>
+    <OutputPath>..\bin\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\bin\AnyCPU\Release\OpenTK.Rift.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Release\OpenTK.Rift.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
     <Message Text="Building OVR library" Importance="normal" />
-    <Exec Command="IF NOT EXIST obj\$(Platform)\$(Configuration)\NUL mkdir obj\$(Platform)\$(Configuration)" Condition="$(OS) == 'Windows_NT'" />
-    <Exec Command="mkdir -p obj/$(Platform)/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
-    <Exec Command="cd obj/$(Platform)/$(Configuration) &amp;&amp; $(CMake) &amp;&amp; $(CMakeInstall)" />
+    <Exec Command="IF NOT EXIST obj\x86\$(Configuration)\NUL mkdir obj\x86\$(Configuration)" Condition="$(OS) == 'Windows_NT'" />
+    <Exec Command="IF NOT EXIST obj\x64\$(Configuration)\NUL mkdir obj\x64\$(Configuration)" Condition="$(OS) == 'Windows_NT'" />
+    <Exec Command="mkdir -p obj/x86/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="mkdir -p obj/x64/$(Configuration) || true" Condition="$(OS) != 'Windows_NT'" />
+    <Exec Command="cd obj/x86/$(Configuration) &amp;&amp; $(CMake_x86) &amp;&amp; $(CMakeInstall) &amp;&amp; cd ../../../" />
+    <Exec Command="cd obj/x64/$(Configuration) &amp;&amp; $(CMake_x64) &amp;&amp; $(CMakeInstall) &amp;&amp; cd ../../../" />
   </Target>
   <Target Name="BeforeClean">
     <Message Text="Cleaning OVR library" Importance="Normal" />
