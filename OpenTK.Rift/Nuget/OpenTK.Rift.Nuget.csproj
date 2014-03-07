@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{ADC34399-7613-44D2-90B2-19250F12FE7B}</ProjectGuid>
     <OutputPath>$(MSBuildProjectDirectory)\obj\</OutputPath>
     <ProductVersion>10.0.0</ProductVersion>
@@ -12,7 +12,7 @@
     <NugetArgs>pack OpenTK.Rift.nuspec -Version @(Version) -OutputDirectory $(OutputPath)</NugetArgs>
     <DownloadMSBuildArgs>https://dl.dropboxusercontent.com/u/30682604/Microsoft.Build.dll $(OutputPath)Microsoft.Build.dll</DownloadMSBuildArgs>
     <DownloadNugetArgs>http://build.nuget.org/NuGet.exe $(OutputPath)NuGet.exe</DownloadNugetArgs>
-    <DownloadUtility>..\..\bin\$(Platform)\$(Configuration)\Tools\Build.DownloadNuget.exe</DownloadUtility>
+    <DownloadUtility>..\..\bin\$(Configuration)\Tools\Build.DownloadNuget.exe</DownloadUtility>
     <Download Condition="$(OS) != 'Windows_NT'">mono $(DownloadUtility)</Download>
     <Download Condition="$(OS) == 'Windows_NT'">$(DownloadUtility)</Download>
     <ExecuteNuget Condition="$(OS) != 'Windows_NT'">
@@ -21,16 +21,6 @@
     <ExecuteNuget Condition="$(OS) == 'Windows_NT'">
       $(OutputPath)NuGet.exe $(NugetArgs)
     </ExecuteNuget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
-    <Optimize>false</Optimize>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -45,7 +35,7 @@
   <Target Name="Build">
     <MakeDir Directories="$(OutputPath)" />
     <!-- Copy built files to the tree format expected by nuget -->
-    <CreateItem Include="../../bin/$(Platform)/$(Configuration)/*">
+    <CreateItem Include="../../bin/$(Configuration)/*">
       <Output TaskParameter="Include" ItemName="Binaries" />
     </CreateItem>
     <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)" />
@@ -62,7 +52,7 @@
     <CreateItem Include="$(OutputPath)OpenTK.Rift*.nupkg">
       <Output TaskParameter="Include" ItemName="NugetPackage" />
     </CreateItem>
-    <Copy SourceFiles="@(NugetPackage)" DestinationFolder="../../bin/$(Platform)/$(Configuration)" />
+    <Copy SourceFiles="@(NugetPackage)" DestinationFolder="../../bin/$(Configuration)" />
   </Target>
   <Target Name="Clean">
     <CreateItem Include="OpenTK.*.nupkg;lib/**">

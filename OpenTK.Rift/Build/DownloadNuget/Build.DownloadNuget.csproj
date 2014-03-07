@@ -7,41 +7,24 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>full</DebugType>
-    <WarningLevel>4</WarningLevel>
-    <OutputPath>..\..\..\bin\x86\Debug\Tools\</OutputPath>
-    <Optimize>false</Optimize>
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DefineConstants>TRACE</DefineConstants>
-    <DebugType>pdbonly</DebugType>
-    <WarningLevel>4</WarningLevel>
-    <OutputPath>..\..\..\bin\x86\Release\Tools\</OutputPath>
-    <Optimize>true</Optimize>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
-    <OutputPath>..\..\..\bin\AnyCPU\Debug\Tools\</OutputPath>
+    <OutputPath>..\..\..\bin\Debug\Tools\</OutputPath>
     <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DefineConstants>TRACE</DefineConstants>
     <DebugType>pdbonly</DebugType>
     <WarningLevel>4</WarningLevel>
-    <OutputPath>..\..\..\bin\AnyCPU\Release\Tools\</OutputPath>
+    <OutputPath>..\..\..\bin\Release\Tools\</OutputPath>
     <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
