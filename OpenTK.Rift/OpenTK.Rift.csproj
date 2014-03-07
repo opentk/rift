@@ -11,10 +11,10 @@
     <AssemblyName>OpenTK.Rift</AssemblyName>
     <!-- CMake invocation -->
     <VSVersion>$(VisualStudioVersion.Substring(0,$(VisualStudioVersion.IndexOf('.'))))</VSVersion>
-    <CMakeGenerator Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'x86'">-G"Visual Studio $(VSVersion)"</CMakeGenerator>
-    <CMakeGenerator Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'AnyCPU'">-G"Visual Studio $(VSVersion) Win64"</CMakeGenerator>
-    <CMakeGenerator Condition="'$(OS)' != 'Windows_NT'"></CMakeGenerator>
-    <CMakeArgs>$(CMakeGenerator) -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
+    <CMakeExtraArgs Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'x86'">-G"Visual Studio $(VSVersion)" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs>
+    <CMakeExtraArgs Condition="'$(OS)' == 'Windows_NT' and '$(Platform)' == 'AnyCPU'">-G"Visual Studio $(VSVersion) Win64" -DCMAKE_CXX_FLAGS="/MP"</CMakeExtraArgs>
+    <CMakeExtraArgs Condition="'$(OS)' != 'Windows_NT'"></CMakeExtraArgs>
+    <CMakeArgs>$(CMakeExtraArgs) -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_LOCATION:PATH=../../../../bin/$(Platform)/$(Configuration) ../../../Wrapper</CMakeArgs>
     <CMakeInstallArgs>--build . --clean-first --config $(Configuration) --target install</CMakeInstallArgs>
     <CMake>cmake $(CMakeGenerator) $(CMakeArgs)</CMake>
     <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
