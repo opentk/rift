@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Target Name="AfterBuild">
-    <CreateItem Include="$(MSBuildThisFileDirectory)../content/lib/x86/OVR.dll">
+    <CreateItem Include="$(MSBuildThisFileDirectory)/lib/x86/OVR.dll">
       <Output TaskParameter="Include" ItemName="Binaries" />
     </CreateItem>
     <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)/lib/x86" />
-    <CreateItem Include="$(MSBuildThisFileDirectory)../content/lib/x64/OVR.dll">
+    <CreateItem Include="$(MSBuildThisFileDirectory)/lib/x64/OVR.dll">
       <Output TaskParameter="Include" ItemName="Binaries" />
     </CreateItem>
     <Copy SourceFiles="@(Binaries)" DestinationFolder="$(OutputPath)/lib/x64" />
