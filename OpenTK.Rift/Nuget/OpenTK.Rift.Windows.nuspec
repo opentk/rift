@@ -35,7 +35,8 @@ Official repository: https://github.com/opentk/rift
         </dependencies>
   </metadata>
     <files>
-      <file src="obj/lib/x86/OVR.dll" target="lib/net40/lib/x86" />
-      <file src="obj/lib/x64/OVR.dll" target="lib/net40/lib/x64" />
+      <file src="obj/lib/x86/OVR.dll" target="content/lib/x86" />
+      <file src="obj/lib/x64/OVR.dll" target="content/lib/x64" />
+      <file src="OpenTK.Rift.Windows.targets" target="build" />
     </files>
 </package>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>OpenTK.Rift.Sample</id>
+    <version>$version$</version>
+    <authors>Stefanos Apostolopoulos</authors>
+    <owners>Stefanos Apostolopoulos</owners>
+    <licenseUrl>http://www.opentk.com/project/license</licenseUrl>
+    <projectUrl>https://github.com/opentk/rift</projectUrl>
+    <iconUrl>file:///./logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>
+OpenTK.Rift.Sample.GL1 demonstrates how to program the Oculus Rift using OpenGL 1.x.
+    </summary>
+    <description>
+OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK.
+OpenTK.Rift.Sample.GL1 demonstrates how to program the Oculus Rift using OpenGL 1.x.
+
+Home page: http://www.opentk.com
+Official repository: https://github.com/opentk/rift
+    </description>
+    <releaseNotes>
+        http://www.opentk.com/news
+    </releaseNotes>
+    <copyright>Copyright 2014 Stefanos Apostolopoulos</copyright>
+    <tags>OpenTK Oculus Rift C# F# VB .Net Mono</tags>
+    <references>
+    </references>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="OpenTK.Rift" version="1.1" />
+      <dependency id="OpenTK.Rift.Linux" version="1.1" />
+      <dependency id="OpenTK.Rift.Mac" version="1.1" />
+      <dependency id="OpenTK.Rift.Windows" version="1.1" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>
