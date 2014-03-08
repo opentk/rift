@@ -431,106 +431,110 @@ namespace OpenTK
             [DllImport("kernel32.dll")]
             static extern IntPtr LoadLibrary(string filename);
 
+            #region Device
+
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_Init")]
+            [DllImport(lib, EntryPoint = "OVR_Init", CallingConvention = CallingConvention.Cdecl)]
             public static extern void Init();
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_Shutdown")]
+            [DllImport(lib, EntryPoint = "OVR_Shutdown", CallingConvention = CallingConvention.Cdecl)]
             public static extern void Shutdown();
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_Create")]
+            [DllImport(lib, EntryPoint = "OVR_Create", CallingConvention = CallingConvention.Cdecl)]
             public static extern OVR_Instance Create();
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_Destroy")]
+            [DllImport(lib, EntryPoint = "OVR_Destroy", CallingConvention = CallingConvention.Cdecl)]
             public static extern OVR_Instance Destroy(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_IsConnected")]
+            [DllImport(lib, EntryPoint = "OVR_IsConnected", CallingConvention = CallingConvention.Cdecl)]
             public static extern bool IsConnected(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetHScreenSize")]
+            [DllImport(lib, EntryPoint = "OVR_GetHScreenSize", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetHScreenSize(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetVScreenSize")]
+            [DllImport(lib, EntryPoint = "OVR_GetVScreenSize", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetVScreenSize(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetVScreenCenter")]
+            [DllImport(lib, EntryPoint = "OVR_GetVScreenCenter", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetVScreenCenter(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetDesktopX")]
+            [DllImport(lib, EntryPoint = "OVR_GetDesktopX", CallingConvention = CallingConvention.Cdecl)]
             public static extern int GetDesktopX(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetDesktopY")]
+            [DllImport(lib, EntryPoint = "OVR_GetDesktopY", CallingConvention = CallingConvention.Cdecl)]
             public static extern int GetDesktopY(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetHResolution")]
+            [DllImport(lib, EntryPoint = "OVR_GetHResolution", CallingConvention = CallingConvention.Cdecl)]
             public static extern int GetHResolution(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetVResolution")]
+            [DllImport(lib, EntryPoint = "OVR_GetVResolution", CallingConvention = CallingConvention.Cdecl)]
             public static extern int GetVResolution(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetEyeToScreenDistance")]
+            [DllImport(lib, EntryPoint = "OVR_GetEyeToScreenDistance", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetEyeToScreenDistance(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetLensSeparationDistance")]
+            [DllImport(lib, EntryPoint = "OVR_GetLensSeparationDistance", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetLensSeparationDistance(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetInterpupillaryDistance")]
+            [DllImport(lib, EntryPoint = "OVR_GetInterpupillaryDistance", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetInterpulpillaryDistance(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetDistortionK")]
+            [DllImport(lib, EntryPoint = "OVR_GetDistortionK", CallingConvention = CallingConvention.Cdecl)]
             public static extern Vector4 GetDistortionK(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetChromaAbCorrection")]
+            [DllImport(lib, EntryPoint = "OVR_GetChromaAbCorrection", CallingConvention = CallingConvention.Cdecl)]
             public static extern Vector4 GetChromaAbCorrection(OVR_Instance inst);
+
+            #endregion
 
             #region Sensor Fusion
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetOrientation")]
+            [DllImport(lib, EntryPoint = "OVR_GetOrientation", CallingConvention = CallingConvention.Cdecl)]
             public static extern Quaternion GetOrientation(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetPredictedOrientation")]
+            [DllImport(lib, EntryPoint = "OVR_GetPredictedOrientation", CallingConvention = CallingConvention.Cdecl)]
             public static extern Quaternion GetPredictedOrientation(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetAcceleration")]
+            [DllImport(lib, EntryPoint = "OVR_GetAcceleration", CallingConvention = CallingConvention.Cdecl)]
             public static extern Vector3 GetAcceleration(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetAngularVelocity")]
+            [DllImport(lib, EntryPoint = "OVR_GetAngularVelocity", CallingConvention = CallingConvention.Cdecl)]
             public static extern Vector3 GetAngularVelocity(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_GetPredictionDelta")]
+            [DllImport(lib, EntryPoint = "OVR_GetPredictionDelta", CallingConvention = CallingConvention.Cdecl)]
             public static extern float GetPredictionDelta(OVR_Instance inst);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_SetPrediction")]
+            [DllImport(lib, EntryPoint = "OVR_SetPrediction", CallingConvention = CallingConvention.Cdecl)]
             public static extern void SetPrediction(OVR_Instance inst, float dt, int enable);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_SetPredictionEnabled")]
+            [DllImport(lib, EntryPoint = "OVR_SetPredictionEnabled", CallingConvention = CallingConvention.Cdecl)]
             public static extern void SetPredictionEnabled(OVR_Instance inst, int enable);
 
             [SuppressUnmanagedCodeSecurity]
-            [DllImport(lib, EntryPoint = "OVR_IsPredictionEnabled")]
+            [DllImport(lib, EntryPoint = "OVR_IsPredictionEnabled", CallingConvention = CallingConvention.Cdecl)]
             public static extern int IsPredictionEnabled(OVR_Instance inst);
 
             #endregion
