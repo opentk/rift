@@ -53,7 +53,7 @@
     <ReadLinesFromFile File="../../Version.txt">
       <Output TaskParameter="Lines" ItemName="Version" />
     </ReadLinesFromFile>
-    <Exec Command="echo `uname` > $(OutputPath)os.txt" Condition="'$(OS)' != 'Windows_NT'" />
+    <Exec Command="echo `uname` &gt; $(OutputPath)os.txt" Condition="'$(OS)' != 'Windows_NT'" />
     <ReadLinesFromFile File="$(OutputPath)os.txt" Condition="Exists('$(OutputPath)os.txt')">
       <Output TaskParameter="Lines" ItemName="OSKernel" />
     </ReadLinesFromFile>
@@ -62,10 +62,11 @@
     <!-- Execute nuget script -->
     <Exec Command="$(Download) $(DownloadMSBuildArgs)" />
     <Exec Command="$(Download) $(DownloadNugetArgs)" />
-    <Exec Command="$(Nuget) pack OpenTK.Rift.nuspec $(NugetArgs)" />
+    <Exec Command="$(Nuget) pack OpenTK.Rift.Managed.nuspec $(NugetArgs)" />
     <Exec Command="$(Nuget) pack OpenTK.Rift.Linux.nuspec $(NugetArgs)" Condition="'$(OS)' == 'Unix' and @(OSKernel) != 'Darwin'" />
     <Exec Command="$(Nuget) pack OpenTK.Rift.Mac.nuspec $(NugetArgs)" Condition="'$(OS)' == 'Unix' and @(OSKernel) == 'Darwin'" />
     <Exec Command="$(Nuget) pack OpenTK.Rift.Windows.nuspec $(NugetArgs)" Condition="'$(OS)' == 'Windows_NT'" />
+    <Exec Command="$(Nuget) pack OpenTK.Rift.nuspec $(NugetArgs)" />
     <Exec Command="$(Nuget) pack OpenTK.Rift.Sample.GL1.nuspec $(NugetArgs)" />
     <!-- Copy the nuget archive to the root directory and add a date stamp -->
     <CreateItem Include="$(OutputPath)OpenTK.Rift*.nupkg">
@@ -98,9 +99,11 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
+    <None Include="OpenTK.Rift.nuspec" />
     <None Include="OpenTK.Rift.Linux.nuspec" />
     <None Include="OpenTK.Rift.Mac.nuspec" />
-    <None Include="OpenTK.Rift.nuspec" />
+    <None Include="OpenTK.Rift.Managed.nuspec" />
+    <None Include="OpenTK.Rift.Sample.GL1.nuspec" />
     <None Include="OpenTK.Rift.Windows.nuspec" />
   </ItemGroup>
 </Project>

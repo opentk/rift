@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -6,9 +6,9 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{95544C84-8678-4DC6-A5CB-015879E31681}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>OpenTK.Rift.Test</RootNamespace>
-    <AssemblyName>OpenTK.Rift.Test</AssemblyName>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Test</RootNamespace>
+    <AssemblyName>Test.GL1</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -26,6 +26,9 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Reference Include="OpenTK">
@@ -37,8 +40,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OculusCamera.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="GL1.cs" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
@@ -55,6 +57,10 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Test.Common.csproj">
+      <Project>{e8321478-509d-45bb-845d-55f7abc53737}</Project>
+      <Name>Test.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\OpenTK.Rift\OpenTK.Rift.csproj">
       <Project>{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}</Project>
       <Name>OpenTK.Rift</Name>

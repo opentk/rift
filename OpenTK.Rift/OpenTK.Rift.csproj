@@ -75,6 +75,7 @@
   </ProjectExtensions>
   <ItemGroup>
     <Compile Include="OculusRift.cs" />
+    <Compile Include="OculusRiftExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>

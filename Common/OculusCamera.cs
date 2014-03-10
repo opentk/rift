@@ -30,16 +30,9 @@
 using System;
 using OpenTK;
 
-namespace OpenTK.Rift.Test
+namespace Test
 {
-    enum CameraType
-    {
-        Default = 0,
-        Left,
-        Right
-    }
-
-    sealed class OculusCamera
+    public sealed class OculusCamera
     {
         readonly OculusRift rift;
         Matrix4 mono_frustum = Matrix4.Identity;
@@ -212,11 +205,11 @@ namespace OpenTK.Rift.Test
                     matrix = mono_frustum;
                     break;
 
-                case CameraType.Left:
+                case CameraType.StereoLeft:
                     matrix = left_frustum;
                     break;
 
-                case CameraType.Right:
+                case CameraType.StereoRight:
                     matrix = right_frustum;
                     break;
 
@@ -238,11 +231,11 @@ namespace OpenTK.Rift.Test
                     // Nothing to do
                     break;
 
-                case CameraType.Left:
+                case CameraType.StereoLeft:
                     Matrix4.Mult(ref matrix, ref left_modelview, out matrix);
                     break;
 
-                case CameraType.Right:
+                case CameraType.StereoRight:
                     Matrix4.Mult(ref matrix, ref right_modelview, out matrix);
                     break;
 

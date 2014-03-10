@@ -35,9 +35,9 @@ using System;
 using System.Drawing;
 using System.Linq;
 
-namespace OpenTK.Rift.Test
+namespace Test
 {
-    class Program : GameWindow
+    class GL1 : GameWindow
     {
         static readonly OculusRift Rift = new OculusRift();
         static readonly DisplayDevice RiftDisplay =
@@ -55,7 +55,7 @@ namespace OpenTK.Rift.Test
 
         float angle;
 
-        public Program()
+        public GL1()
             : base(
                 RiftDisplay.Width,
                 RiftDisplay.Height,
@@ -111,8 +111,8 @@ namespace OpenTK.Rift.Test
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            DrawScene(CameraType.Left);
-            DrawScene(CameraType.Right);
+            DrawScene(CameraType.StereoLeft);
+            DrawScene(CameraType.StereoRight);
 
             SwapBuffers();
         }
@@ -148,11 +148,11 @@ namespace OpenTK.Rift.Test
                     GL.Viewport(0, 0, Width, Height);
                     break;
 
-                case CameraType.Left:
+                case CameraType.StereoLeft:
                     GL.Viewport(0, 0, Width / 2, Height);
                     break;
 
-                case CameraType.Right:
+                case CameraType.StereoRight:
                     GL.Viewport(Width / 2, 0, Width / 2, Height);
                     break;
             }
@@ -213,7 +213,7 @@ namespace OpenTK.Rift.Test
         public static void Main()
         {
             using (Toolkit.Init())
-            using (var gw = new Program())
+            using (var gw = new GL1())
             {
                 gw.Run(60.0);
             }

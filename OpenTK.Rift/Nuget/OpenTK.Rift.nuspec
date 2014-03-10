@@ -1,52 +1,45 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
-    <metadata>
-        <id>OpenTK.Rift</id>
-        <version>$version$</version>
-        <authors>Stefanos Apostolopoulos</authors>
-        <owners>Stefanos Apostolopoulos</owners>
-        <licenseUrl>http://www.opentk.com/project/license</licenseUrl>
-        <projectUrl>https://github.com/opentk/rift</projectUrl>
-        <iconUrl>file:///./logo.png</iconUrl>
-        <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <summary>
+  <metadata>
+    <id>OpenTK.Rift</id>
+    <version>$version$</version>
+    <authors>Stefanos Apostolopoulos</authors>
+    <owners>Stefanos Apostolopoulos</owners>
+    <licenseUrl>http://www.opentk.com/project/license</licenseUrl>
+    <projectUrl>https://github.com/opentk/rift</projectUrl>
+    <iconUrl>file:///./logo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>
 OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK.
-        </summary>
-        <description>
-OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK.
-
-Features
-- Create great Oculus Rift applications from the comfort of C#, F# and VB.Net
-- Increase your reach: support for Windows, Linux and Mac OS X
-- Break the limits: leverage the full power of OpenGL 4.4, OpenCL and OpenAL
-- Code faster: avoid the pitfalls of C++ memory management
-
-To use OpenTK.Rift, you also need to install at least one of the following
-NuGet packages:
-- OpenTK.Rift.Linux
-- OpenTK.Rift.Mac
-- OpenTK.Rift.Windows
+    </summary>
+    <description>
+OpenTK.Rift is an intuitive, cross-platform C# wrapper for the Oculus Rift SDK. This package will install everything you need to create OpenGL applications for the Oculus Rift on Windows, Linux or Mac OS X.
 
 Home page: http://www.opentk.com
 Official repository: https://github.com/opentk/rift
-        </description>
-        <releaseNotes>
-            http://www.opentk.com/news
-        </releaseNotes>
-        <copyright>Copyright 2014 Stefanos Apostolopoulos</copyright>
-        <tags>OpenTK Oculus Rift C# F# VB .Net Mono</tags>
-        <references>
-            <reference file="OpenTK.Rift.dll" />
-        </references>
-        <frameworkAssemblies>
-        </frameworkAssemblies>
-        <dependencies>
-          <dependency id="OpenTK" version="1.1.1500" />
-        </dependencies>
+
+Features:
+- Program in C#, F# or VB.Net
+- Use OpenGL 4.4 for cutting-edge graphics
+- Use OpenAL 1.1 for environmental audio
+- Distribute on Windows, Linux and Mac OS X
+    </description>
+    <releaseNotes>
+        http://www.opentk.com/news
+    </releaseNotes>
+    <copyright>Copyright 2014 Stefanos Apostolopoulos</copyright>
+    <tags>OpenTK Oculus Rift C# F# VB .Net Mono</tags>
+    <references>
+    </references>
+    <frameworkAssemblies>
+    </frameworkAssemblies>
+    <dependencies>
+      <dependency id="OpenTK.Rift.Managed" version="1.1" />
+      <dependency id="OpenTK.Rift.Linux" version="1.1" />
+      <dependency id="OpenTK.Rift.Mac" version="1.1" />
+      <dependency id="OpenTK.Rift.Windows" version="1.1" />
+    </dependencies>
   </metadata>
-    <files>
-        <file src="obj/OpenTK.Rift.dll" target="lib/net40" />
-        <file src="obj/OpenTK.Rift.xml" target="lib/net40" />
-        <file src="obj/OpenTK.Rift.dll.config" target="lib/net40" />
-    </files>
+  <files>
+  </files>
 </package>

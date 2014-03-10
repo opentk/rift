@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -7,8 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EBFBC079-3357-4707-94E7-26BB904DF4E8}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>OpenTK.Rift.TestConsole</RootNamespace>
-    <AssemblyName>OpenTK.Rift.TestConsole</AssemblyName>
+    <RootNamespace>Test</RootNamespace>
+    <AssemblyName>Test.Console</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
