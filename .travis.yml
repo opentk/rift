@@ -17,4 +17,6 @@ before_install:
 
 script:
  - xbuild /p:Configuration=Debug /p:Platform="Any CPU"
+ - xbuild /p:Configuration=Debug OpenTK.Rift/Nuget/OpenTK.Rift.Nuget.csproj
  - xbuild /p:Configuration=Release /p:Platform="Any CPU"
+ - xbuild /p:Configuration=Release OpenTK.Rift/Nuget/OpenTK.Rift.Nuget.csproj
