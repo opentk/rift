@@ -37,7 +37,7 @@ using System.Linq;
 
 namespace Test
 {
-    class GL1 : GameWindow
+    class GL2 : GameWindow
     {
         static readonly OculusRift Rift = new OculusRift();
         static readonly DisplayDevice RiftDisplay =
@@ -53,9 +53,9 @@ namespace Test
             new Vector3(0, 1.6f, 5f),
             Quaternion.Identity);
 
-        float angle;
+        MouseState mouse_prev;
 
-        public GL1()
+        public GL2()
             : base(
                 RiftDisplay.Width,
                 RiftDisplay.Height,
@@ -91,7 +91,23 @@ namespace Test
                 Close();
             }
 
-            angle += 16 * (float)TargetUpdatePeriod;
+            var mouse = OpenTK.Input.Mouse.GetState();
+            if (mouse != mouse_prev)
+            {
+                var delta = new Vector3
+                {
+                    X = mouse.X - mouse_prev.X,
+                    Y = mouse.Y - mouse_prev.Y,
+                    Z = mouse.WheelPrecise - mouse_prev.WheelPrecise
+                };
+
+                Camera.Orientation = Quaternion.FromAxisAngle(
+                    delta.Normalized(),
+                    delta.Length);
+
+                mouse_prev = mouse;
+            }
+
 
             if (Keyboard[Key.Right])
                 half_ipd *= 1.01f;
@@ -136,7 +152,7 @@ namespace Test
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref matrix);
 
-            GL.Rotate(angle, 0.0f, 1.0f, 0.0f);
+            //GL.Rotate(angle, 0.0f, 1.0f, 0.0f);
             DrawCube();
         }
 
@@ -213,7 +229,7 @@ namespace Test
         public static void Main()
         {
             using (Toolkit.Init())
-            using (var gw = new GL1())
+            using (var gw = new GL2())
             {
                 gw.Run(60.0);
             }

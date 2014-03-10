@@ -11,13 +11,15 @@
     <AssemblyName>Test.GL2</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,31 +28,28 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+    <Reference Include="System.Drawing" />
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4">
       <HintPath>..\..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Test.Common.csproj">
-      <Project>{e8321478-509d-45bb-845d-55f7abc53737}</Project>
-      <Name>Test.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\OpenTK.Rift\OpenTK.Rift.csproj">
-      <Project>{73cde2a5-3287-4d55-845d-a10bbe33f8cd}</Project>
+      <Project>{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}</Project>
       <Name>OpenTK.Rift</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Test.Common.csproj">
+      <Project>{E8321478-509D-45BB-845D-55F7ABC53737}</Project>
+      <Name>Test.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
