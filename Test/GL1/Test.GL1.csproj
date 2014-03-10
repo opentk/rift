@@ -26,9 +26,6 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Reference Include="OpenTK">
@@ -57,13 +54,13 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Test.Common.csproj">
-      <Project>{e8321478-509d-45bb-845d-55f7abc53737}</Project>
-      <Name>Test.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\OpenTK.Rift\OpenTK.Rift.csproj">
       <Project>{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}</Project>
       <Name>OpenTK.Rift</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Test.Common.csproj">
+      <Project>{E8321478-509D-45BB-845D-55F7ABC53737}</Project>
+      <Name>Test.Common</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
