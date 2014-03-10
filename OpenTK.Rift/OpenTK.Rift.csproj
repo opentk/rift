@@ -24,7 +24,6 @@
     <CMake_x64>cmake $(CMakeArgs_x64)</CMake_x64>
     <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Optimize>false</Optimize>
