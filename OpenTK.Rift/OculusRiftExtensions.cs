@@ -5,6 +5,10 @@ using System.Text;
 
 namespace OpenTK
 {
+    /// <summary>
+    /// Contains extension methods to simplify interaction with
+    /// <see cref="OpenTK.OculusRift"/>.
+    /// </summary>
     public static class OculusRiftExtensions
     {
         #region Public Members
