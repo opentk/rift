@@ -40,13 +40,7 @@ namespace Test
     class GL1 : GameWindow
     {
         static readonly OculusRift Rift = new OculusRift();
-        static readonly DisplayDevice RiftDisplay =
-            (Enumerable
-                .Range((int)DisplayIndex.First, (int)DisplayIndex.Sixth)
-                .Select(i => DisplayDevice.GetDisplay(DisplayIndex.First + i))
-                .Where(d => d != null && d.Width == Rift.HResolution && d.Height == Rift.VResolution)
-                .FirstOrDefault()) ??
-            DisplayDevice.Default;
+        static readonly DisplayDevice RiftDisplay = Rift.GetDisplay();
 
         readonly OculusCamera Camera = new OculusCamera(
             Rift,
