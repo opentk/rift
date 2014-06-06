@@ -451,7 +451,7 @@ namespace OpenTK
             [DllImport("kernel32.dll")]
             static extern IntPtr LoadLibrary(string filename);
 
-            #region DistortionRenderer
+            #region OVR Interface
 
             [DllImport(lib, EntryPoint = "ovr_Initialize", CallingConvention = CallingConvention.Winapi)]
             [return: MarshalAs(UnmanagedType.I1)]
@@ -459,6 +459,10 @@ namespace OpenTK
 
             [DllImport(lib, EntryPoint = "ovr_Shutdown", CallingConvention = CallingConvention.Winapi)]
             public static extern void Shutdown();
+
+            #endregion
+
+            #region HMD Interface
 
             // Detects or re-detects HMDs and reports the total number detected.
             // Users can get information about each HMD by calling ovrHmd_Create with an index.
@@ -496,6 +500,10 @@ namespace OpenTK
             [DllImport(lib, EntryPoint = "ovrHmd_SetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
             public static extern void SetEnabledCaps(ovrHmd hmd, HMDisplayCaps hmdCaps);
 
+            #endregion
+
+            #region Sensor Interface
+
             // All sensor interface functions are thread-safe, allowing sensor state to be sampled
             // from different threads.
             // Starts sensor sampling, enabling specified capabilities, described by ovrSensorCaps.
@@ -514,11 +522,11 @@ namespace OpenTK
 
             // Stops sensor sampling, shutting down internal resources.
             [DllImport(lib, EntryPoint = "ovrHmd_StopSensor", CallingConvention = CallingConvention.Winapi)]
-            public static extern void ovrHmd_StopSensor(ovrHmd hmd);
+            public static extern void StopSensor(ovrHmd hmd);
 
             // Resets sensor orientation.
             [DllImport(lib, EntryPoint = "ovrHmd_ResetSensor", CallingConvention = CallingConvention.Winapi)]
-            public static extern void ovrHmd_ResetSensor(ovrHmd hmd);
+            public static extern void ResetSensor(ovrHmd hmd);
 
             // Returns sensor state reading based on the specified absolute system time.
             // Pass absTime value of 0.0 to request the most recent sensor reading; in this case
@@ -526,13 +534,234 @@ namespace OpenTK
             // ovrHmd_GetEyePredictedSensorState relies on this internally.
             // This may also be used for more refined timing of FrontBuffer rendering logic, etc.
             [DllImport(lib, EntryPoint = "ovrHmd_GetSensorState", CallingConvention = CallingConvention.Winapi)]
-            public static extern SensorState ovrHmd_GetSensorState(ovrHmd hmd, double absTime);
+            public static extern SensorState GetSensorState(ovrHmd hmd, double absTime);
 
             // Returns information about a sensor.
             // Only valid after StartSensor.
             [DllImport(lib, EntryPoint = "ovrHmd_GetSensorDesc", CallingConvention = CallingConvention.Winapi)]
             [return: MarshalAs(UnmanagedType.I1)]
-            public static extern bool ovrHmd_GetSensorDesc(ovrHmd hmd, StringBuilder descOut);
+            public static extern bool GetSensorDesc(ovrHmd hmd, StringBuilder descOut);
+
+            #endregion
+
+            #region Graphics Setup
+
+            // Fills in description about HMD; this is the same as filled in by ovrHmd_Create.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetDesc", CallingConvention = CallingConvention.Winapi)]
+            public static extern void GetDesc(ovrHmd hmd, out HMDisplayDescription desc);
+
+            // Calculates texture size recommended for rendering one eye within HMD, given FOV cone.
+            // Higher FOV will generally require larger textures to maintain quality.
+            //  - pixelsPerDisplayPixel specifies that number of render target pixels per display
+            //    pixel at center of distortion; 1.0 is the default value. Lower values
+            //    can improve performance.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetFovTextureSize", CallingConvention = CallingConvention.Winapi)]
+            public static extern OculusSize GetFovTextureSize(ovrHmd hmd, EyeType eye, FovPort fov,
+                float pixelsPerDisplayPixel);
+
+            #endregion
+
+            #region SDK Rendering
+
+            // These functions support rendering of distortion by the SDK through direct
+            // access to the underlying rendering HW, such as D3D or GL.
+            // This is the recommended approach, as it allows for better support or future
+            // Oculus hardware and a range of low-level optimizations.
+
+
+            // Configures rendering; fills in computed render parameters.
+            // This function can be called multiple times to change rendering settings.
+            // The users pass in two eye view descriptors that are used to
+            // generate complete rendering information for each eye in eyeRenderDescOut[2].
+            //
+            //  - apiConfig provides D3D/OpenGL specific parameters. Pass null
+            //    to shutdown rendering and release all resources.
+            //  - distortionCaps describe distortion settings that will be applied.
+            //
+            [return: MarshalAs(UnmanagedType.I1)]
+            [DllImport(lib, EntryPoint = "ovrHmd_ConfigureRendering", CallingConvention = CallingConvention.Winapi)]
+            public static extern bool ConfigureRendering(ovrHmd hmd,
+                ref RenderConfiguration apiConfig,
+                DistortionCaps distortionCaps,
+                [MarshalAs(UnmanagedType.LPArray, SizeConst=2)] FovPort[] eyeFovIn,
+                [MarshalAs(UnmanagedType.LPArray, SizeConst=2)] EyeRenderDescription[] eyeRenderDescOut);
+
+
+            // Begins a frame, returning timing and orientation information useful for simulation.
+            // This should be called in the beginning of game rendering loop (on render thread).
+            // This function relies on ovrHmd_BeginFrameTiming for some of its functionality.
+            // Pass 0 for frame index if not using GetFrameTiming.
+            [DllImport(lib, EntryPoint = "ovrHmd_BeginFrame", CallingConvention = CallingConvention.Winapi)]
+            public static extern FrameTiming BeginFrame(ovrHmd hmd, int frameIndex);
+
+            // Ends frame, rendering textures to frame buffer. This may perform distortion and scaling
+            // internally, assuming is it not delegated to another thread. 
+            // Must be called on the same thread as BeginFrame. Calls ovrHmd_BeginEndTiming internally.
+            // *** This Function will to Present/SwapBuffers and potentially wait for GPU Sync ***.
+            [DllImport(lib, EntryPoint = "ovrHmd_EndFrame", CallingConvention = CallingConvention.Winapi)]
+            public static extern void EndFrame(ovrHmd hmd);
+
+
+            // Marks beginning of eye rendering. Must be called on the same thread as BeginFrame.
+            // This function uses ovrHmd_GetEyePose to predict sensor state that should be
+            // used rendering the specified eye.
+            // This combines current absolute time with prediction that is appropriate for this HMD.
+            // It is ok to call ovrHmd_BeginEyeRender() on both eyes before calling ovrHmd_EndEyeRender.
+            // If rendering one eye at a time, it is best to render eye specified by
+            // HmdDesc.EyeRenderOrder[0] first.
+            [DllImport(lib, EntryPoint = "ovrHmd_BeginEyeRender", CallingConvention = CallingConvention.Winapi)]
+            public static extern OculusPose BeginEyeRender(ovrHmd hmd, EyeType eye);
+
+            // Marks the end of eye rendering and submits the eye texture for display after it is ready.
+            // Rendering viewport within the texture can change per frame if necessary.
+            // Specified texture may be presented immediately or wait until ovrHmd_EndFrame based
+            // on the implementation. The API performs distortion and scaling internally.
+            // 'renderPose' will typically be the value returned from ovrHmd_BeginEyeRender, but can
+            // be different if a different pose was used for rendering.
+            [DllImport(lib, EntryPoint = "ovrHmd_EndEyeRender", CallingConvention = CallingConvention.Winapi)]
+            public static extern void EndEyeRender(ovrHmd hmd, EyeType eye,
+                OculusPose renderPose, ref OculusTexture eyeTexture);
+
+            #endregion
+
+            #region Game-Side Rendering Functions
+
+            // These functions provide distortion data and render timing support necessary to allow
+            // game rendering of distortion. Game-side rendering involves the following steps:
+            //
+            //  1. Setup ovrEyeDesc based on desired texture size and Fov.
+            //     Call ovrHmd_GetRenderDesc to get the necessary rendering parameters for each eye.
+            // 
+            //  2. Use ovrHmd_CreateDistortionMesh to generate distortion mesh.
+            //
+            //  3. Use ovrHmd_BeginFrameTiming, ovrHmd_GetEyePose and ovrHmd_BeginFrameTiming
+            //     in the rendering loop to obtain timing and predicted view orientation for
+            //     each eye.
+            //      - If relying on timewarp, use ovr_WaitTillTime after rendering+flush, followed
+            //        by ovrHmd_GetEyeTimewarpMatrices to obtain timewarp matrices used 
+            //        in distortion pixel shader to reduce latency.
+            //
+
+            // Computes distortion viewport, view adjust and other rendering for the specified
+            // eye. This can be used instead of ovrHmd_ConfigureRendering to help setup rendering on
+            // the game side.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetRenderDesc", CallingConvention = CallingConvention.Winapi)]
+            public static extern EyeRenderDescription GetRenderDescription(ovrHmd hmd,
+                EyeType eyeType, FovPort fov);
+
+            // Generate distortion mesh per eye.
+            // Distortion capabilities will depend on 'distortionCaps' flags; user should rely on
+            // appropriate shaders based on their settings.
+            // Distortion mesh data will be allocated and stored into the ovrDistortionMesh data structure,
+            // which should be explicitly freed with ovrHmd_DestroyDistortionMesh.
+            // Users should call ovrHmd_GetRenderScaleAndOffset to get uvScale and Offset values for rendering.
+            // The function shouldn't fail unless theres is a configuration or memory error, in which case
+            // ovrDistortionMesh values will be set to null.
+            [DllImport(lib, EntryPoint = "ovrHmd_CreateDistortionMesh", CallingConvention = CallingConvention.Winapi)]
+            [return: MarshalAs(UnmanagedType.I1)]
+            public static extern bool CreateDistortionMesh(ovrHmd hmd,
+                EyeType eyeType, FovPort fov,
+                DistortionCaps distortionCaps,
+                ref DistortionMesh meshData);
+
+            // Frees distortion mesh allocated by ovrHmd_GenerateDistortionMesh. meshData elements
+            // are set to null and zeroes after the call.
+            [DllImport(lib, EntryPoint = "ovrHmd_DestroyDistortionMesh", CallingConvention = CallingConvention.Winapi)]
+            public static extern void DestroyDistortionMesh(ref DistortionMesh meshData);
+
+            // Computes updated 'uvScaleOffsetOut' to be used with a distortion if render target size or
+            // viewport changes after the fact. This can be used to adjust render size every frame, if desired.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetRenderScaleAndOffset", CallingConvention = CallingConvention.Winapi)]
+            public static extern void GetRenderScaleAndOffset(FovPort fov,
+                OculusSize textureSize, OculusRectangle renderViewport,
+                [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Vector2[] uvScaleOffsetOut);
+
+            // Thread-safe timing function for the main thread. Caller should increment frameIndex
+            // with every frame and pass the index to RenderThread for processing.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetFrameTiming", CallingConvention = CallingConvention.Winapi)]
+            public static extern FrameTiming GetFrameTiming(ovrHmd hmd, int frameIndex);
+
+            // Called at the beginning of the frame on the Render Thread.
+            // Pass frameIndex == 0 if ovrHmd_GetFrameTiming isn't being used. Otherwise,
+            // pass the same frame index as was used for GetFrameTiming on the main thread.
+            [DllImport(lib, EntryPoint = "ovrHmd_BeginFrameTiming", CallingConvention = CallingConvention.Winapi)]
+            public static extern FrameTiming BeginFrameTiming(ovrHmd hmd, int frameIndex);
+
+            // Marks the end of game-rendered frame, tracking the necessary timing information. This
+            // function must be called immediately after Present/SwapBuffers + GPU sync. GPU sync is important
+            // before this call to reduce latency and ensure proper timing.
+            [DllImport(lib, EntryPoint = "ovrHmd_EndFrameTiming", CallingConvention = CallingConvention.Winapi)]
+            public static extern void EndFrameTiming(ovrHmd hmd);
+
+            // Initializes and resets frame time tracking. This is typically not necessary, but
+            // is helpful if game changes vsync state or video mode. vsync is assumed to be on if this
+            // isn't called. Resets internal frame index to the specified number.
+            [DllImport(lib, EntryPoint = "ovrHmd_ResetFrameTiming", CallingConvention = CallingConvention.Winapi)]
+            public static extern void ResetFrameTiming(ovrHmd hmd, int frameIndex);
+
+            // Predicts and returns Pose that should be used rendering the specified eye.
+            // Must be called between ovrHmd_BeginFrameTiming & ovrHmd_EndFrameTiming.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetEyePose", CallingConvention = CallingConvention.Winapi)]
+            public static extern OculusPose GetEyePose(ovrHmd hmd, EyeType eye);
+
+            // Computes timewarp matrices used by distortion mesh shader, these are used to adjust
+            // for orientation change since the last call to ovrHmd_GetEyePose for this eye.
+            // The ovrDistortionVertex::TimeWarpFactor is used to blend between the matrices,
+            // usually representing two different sides of the screen.
+            // Must be called on the same thread as ovrHmd_BeginFrameTiming.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetEyeTimewarpMatrices", CallingConvention = CallingConvention.Winapi)]
+            public static extern void GetEyeTimewarpMatrices(ovrHmd hmd, EyeType eye,
+                OculusPose renderPose, [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Matrix4[] twmOut);
+
+            #endregion
+
+            #region Stateless math setup functions
+
+            // Used to generate projection from ovrEyeDesc::Fov.
+            [DllImport(lib, EntryPoint = "ovrMatrix4f_Projection", CallingConvention = CallingConvention.Winapi)]
+            public static extern Matrix4 Projection(FovPort fov,
+                float znear, float zfar, [MarshalAs(UnmanagedType.I1)] bool rightHanded );
+
+            // Used for 2D rendering, Y is down
+            // orthoScale = 1.0f / pixelsPerTanAngleAtCenter
+            // orthoDistance = distance from camera, such as 0.8m
+            [DllImport(lib, EntryPoint = "ovrMatrix4f_OrthoSubProjection", CallingConvention = CallingConvention.Winapi)]
+            public static extern Matrix4 OrthoSubProjection(Matrix4 projection, Vector2 orthoScale,
+                float orthoDistance, float eyeViewAdjustX);
+
+            // Returns global, absolute high-resolution time in seconds. This is the same
+            // value as used in sensor messages.
+            [DllImport(lib, EntryPoint = "ovr_GetTimeInSeconds", CallingConvention = CallingConvention.Winapi)]
+            public static extern double GetTimeInSeconds();
+
+            // Waits until the specified absolute time.
+            [DllImport(lib, EntryPoint = "ovr_WaitTillTime", CallingConvention = CallingConvention.Winapi)]
+            public static extern double WaitTillTime(double absTime);
+
+            #endregion
+
+            #region Latency Test interface
+
+            // Does latency test processing and returns 'TRUE' if specified rgb color should
+            // be used to clear the screen.
+            [DllImport(lib, EntryPoint = "ovrHmd_ProcessLatencyTest", CallingConvention = CallingConvention.Winapi)]
+            [return: MarshalAs(UnmanagedType.I1)]
+            public static extern bool ProcessLatencyTest(ovrHmd hmd,
+                [Out][MarshalAs(UnmanagedType.LPStr, SizeConst = 3)] byte rgbColorOut);
+
+            // Returns non-null string once with latency test result, when it is available.
+            // Buffer is valid until next call.
+            [DllImport(lib, EntryPoint = "ovrHmd_GetLatencyTestResult", CallingConvention = CallingConvention.Winapi)]
+            public static extern IntPtr GetLatencyTestResultPointer(ovrHmd hmd);
+            public static string GetLatencyTestResult(ovrHmd hmd)
+            {
+                return Marshal.PtrToStringAnsi(GetLatencyTestResultPointer(hmd));
+            }
+
+            // Returns latency for HMDs that support internal latency testing via the
+            // pixel-read back method (-1 for invalid or N/A)
+            [DllImport(lib, EntryPoint = "ovrHmd_GetMeasuredLatencyTest2", CallingConvention = CallingConvention.Winapi)]
+            public static extern double GetMeasuredLatencyTest2(ovrHmd hmd);
 
             #endregion
         }
@@ -789,28 +1018,108 @@ namespace OpenTK
 
     #region Structures
 
+    /// <summary>
+    /// Defines a 2d point.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct OculusPoint
     {
+        /// <summary>
+        /// The x coordinate of this <see cref="OculusPoint"/>.
+        /// </summary>
         public int X;
+
+        /// <summary>
+        /// The y coordinate of this <see cref="OculusPoint"/>.
+        /// </summary>
         public int Y;
     }
 
+    /// <summary>
+    /// Defines a 2d size.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct OculusSize
     {
+        /// <summary>
+        /// The width of this <see cref="OculusSize"/>.
+        /// </summary>
         public int Width;
+
+        /// <summary>
+        /// The height of this <see cref="OculusSize"/>.
+        /// </summary>
         public int Height;
+    }
+
+    /// <summary>
+    /// Defines a 2d rectangle.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct OculusRectangle
+    {
+        /// <summary>
+        /// An <see cref="OculusPoint"/> resresenting the top-left corner of this <see cref="OculusRectangle"/>.
+        /// </summary>
+        public OculusPoint Point;
+
+        /// <summary>
+        /// An <see cref="OculusSize"/> resresenting the width and height of this <see cref="OculusRectangle"/>.
+        /// </summary>
+        public OculusSize Size;
+
+        /// <summary>
+        /// Gets or sets the x coordinate of this <see cref="OculusRectangle"/>.
+        /// </summary>
+        public int X
+        {
+            get { return Point.X; }
+            set { Point.X = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the y coordinate of this <see cref="OculusRectangle"/>.
+        /// </summary>
+        public int Y
+        {
+            get { return Point.Y; }
+            set { Point.Y = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the width of this <see cref="OculusRectangle"/>.
+        /// </summary>
+        public int Width
+        {
+            get { return Size.Width; }
+            set { Size.Width = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the height of this <see cref="OculusRectangle"/>.
+        /// </summary>
+        public int Height
+        {
+            get { return Size.Height; }
+            set { Size.Height = value; }
+        }
     }
 
     /// <summary>
     /// Position and orientation together.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct Pose
+    public struct OculusPose
     {
-        Quaternion Orientation;
-        Vector3 Position;
+        /// <summary>
+        /// A <see cref="OpenTK.Quaternion"/> describing the orientation of this <see cref="OculusPose"/>.
+        /// </summary>
+        public Quaternion Orientation;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector3"/> describing the position of this <see cref="OculusPose"/>.
+        /// </summary>
+        public Vector3 Position;
     }
 
     /// <summary>
@@ -819,10 +1128,29 @@ namespace OpenTK
     [StructLayout(LayoutKind.Sequential)]
     public struct PoseState
     {
-        public Pose Pose;
+        /// <summary>
+        /// The <see cref="OculusPose"/> for this <see cref="PoseState"/>.
+        /// </summary>
+        public OculusPose Pose;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector3"/> representing the angular velocity of this <see cref="PoseState"/>.
+        /// </summary>
         public Vector3 AngularVelocity;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector3"/> representing the linear velocity of this <see cref="PoseState"/>.
+        /// </summary>
         public Vector3 LinearVelocity;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector3"/> representing the angular acceleration of this <see cref="PoseState"/>.
+        /// </summary>
         public Vector3 AngularAcceleration;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector3"/> representing the linear acceleration of this <see cref="PoseState"/>.
+        /// </summary>
         public Vector3 LinearAcceleration;
 
         /// <summary>
@@ -839,9 +1167,24 @@ namespace OpenTK
     [StructLayout(LayoutKind.Sequential)]
     public struct FovPort
     {
+        /// <summary>
+        /// The up tangent for this <see cref="FovPort"/>.
+        /// </summary>
         public float UpTan;
+
+        /// <summary>
+        /// The down tangent for this <see cref="FovPort"/>.
+        /// </summary>
         public float DownTan;
+
+        /// <summary>
+        /// The left tangent for this <see cref="FovPort"/>.
+        /// </summary>
         public float LeftTan;
+
+        /// <summary>
+        /// The right tangent for this <see cref="FovPort"/>.
+        /// </summary>
         public float RightTan;
     }
 
@@ -967,6 +1310,226 @@ namespace OpenTK
         /// Sensor status described by <see cref="StatusFlags"/>.
         /// </summary>
         public StatusFlags StatusFlags;
+    }
+
+    /// <summary>
+    /// Rendering information for each eye, computed either by <see cref="OculusRift.ConfigureRendering"/>
+    /// or by <see cref="OculusRift.GetRenderDescription"/>, based on the specified Fov.
+    /// Note that the rendering viewport is not included here as it can be 
+    /// specified separately and modified per frame though:
+    ///    (a) calling <see cref="OculusRift.GetRenderScaleAndOffset"/>with game-rendered api,
+    /// or (b) passing different values in <see cref="Texture"/> in case of SDK-rendered distortion.
+    /// </summary>
+    public struct EyeRenderDescription
+    {
+        /// <summary>
+        /// The <see cref="EyeType"/> described by this instance.
+        /// </summary>
+        public EyeType Eye;
+
+        /// <summary>
+        /// The <see cref="FovPort"/> configuration for this instance.
+        /// </summary>
+        public FovPort Fov;
+
+        /// <summary>
+        /// An <see cref="OculusRectangle"/> representing the viewport after distortion.
+        /// </summary>
+        public OculusRectangle DistortedViewport;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector2"/> represting the number of display pixels that will fit in tan(angle) = 1.
+        /// </summary>
+        public Vector2 PixelsPerTanAngleAtCenter;
+
+        /// <summary>
+        /// A <see cref="OpenTK.Vector3"/> represting the translation that must be applied to the view matrix.
+        /// </summary>
+        public Vector3 ViewAdjust;
+    }
+
+    /// <summary>
+    /// Describes a vertex used for distortion; this is intended to be converted into
+    /// the engine-specific format.
+    /// Some fields may be unused based on the selected <see cref="DistortionCaps"/>.
+    /// TexG and TexB, for example, are not used if chromatic correction is not requested.
+    /// </summary>
+    public struct DistortionVertex
+    {
+        /// <summary>
+        /// The vertex position.
+        /// </summary>
+        public Vector2 Position;
+
+        /// <summary>
+        /// Lerp factor between time-warp matrices. Can be encoded in Position.Z
+        /// </summary>
+        public float TimeWarpFactor;
+
+        /// <summary>
+        /// Vignette fade factor. Can be encoded in Position.W
+        /// </summary>
+        public float VignetteFactor;
+
+        /// <summary>
+        /// Texture R coordinates.
+        /// </summary>
+        public Vector2 TexR;
+
+        /// <summary>
+        /// Texture G coordinates.
+        /// </summary>
+        public Vector2 TexG;
+
+        /// <summary>
+        /// Texture B coordinates.
+        /// </summary>
+        public Vector2 TexB;
+    }
+
+    /// <summary>
+    /// Describes a full set of distortion mesh data, filled in by <see cref="OpenTK.OculusRift.CreateDistortionMesh"/>.
+    /// Contents of this data structure, if not null, should be freed by <see cref="OpenTK.OculusRift.DestroyDistortionMesh"/>.
+    /// </summary>
+    public struct DistortionMesh
+    {
+        /// <summary>
+        /// An unmanaged array of <see cref="DistortionVertex"/> structures.
+        /// </summary>
+        public IntPtr VertexData;
+
+        /// <summary>
+        /// An unmanaged array of <see cref="System.UInt16"/> indices.
+        /// </summary>
+        public IntPtr IndexData;
+
+        /// <summary>
+        /// The number of <see cref="DistortionVertex"/> elements in <see cref="DistortionMesh.VertexData"/>.
+        /// </summary>
+        public int VertexCount;
+
+        /// <summary>
+        /// The number of <see cref="System.UInt16"/> elements in <see cref="DistortionMesh.IndexData"/>.
+        /// </summary>
+        public int IndexCount;
+    }
+
+    /// <summary>
+    /// Represts frame timing information reported by <see cref="OculusRift.BeginFrameTiming"/>
+    /// <para>
+    /// It is generally expected that the following hold:
+    /// ThisFrameSeconds < TimewarpPointSeconds < NextFrameSeconds < 
+    /// EyeScanoutSeconds[EyeOrder[0]] <= ScanoutMidpointSeconds <= EyeScanoutSeconds[EyeOrder[1]]
+    /// </para>
+    /// </summary>
+    public struct FrameTiming
+    {
+        /// <summary>
+        /// The amount of time that has passed since the previous frame returned
+        /// BeginFrameSeconds value, usable for movement scaling.
+        /// This will be clamped to no more than 0.1 seconds to prevent
+        /// excessive movement after pauses for loading or initialization.
+        /// </summary>
+        public float DeltaSeconds;
+
+        /// <summary>
+        /// Absolute time value of when rendering of this frame began or is expected to
+        /// begin; generally equal to NextFrameSeconds of the previous frame. Can be used
+        /// for animation timing.
+        /// </summary>
+        public double ThisFrameSeconds;
+
+        /// <summary>
+        /// Absolute point when IMU expects to be sampled for this frame.
+        /// </summary>
+        public double TimewarpPointSeconds;
+
+        /// <summary>
+        /// Absolute time when frame Present + GPU Flush will finish, and the next frame starts.
+        /// </summary>
+        public double NextFrameSeconds;
+
+        /// <summary>
+        /// Time when when half of the screen will be scanned out. Can be passes as a prediction
+        /// value to <see cref="OculusRift.GetSensorState"/> to get general orientation.
+        /// </summary>
+        public double ScanoutMidpointSeconds;
+
+        /// <summary>
+        /// Timing points when each eye will be scanned out to display. Used for rendering each eye. 
+        /// </summary>
+        public double EyeScanoutSecondsLeft;
+
+        /// <summary>
+        /// Timing points when each eye will be scanned out to display. Used for rendering each eye. 
+        /// </summary>
+        public double EyeScanoutSecondsRight;
+    }
+
+    /// <summary>
+    /// A platform-independent rendering configuration, which is
+    /// part of the return value of <see cref="OculusRift.Configure"/>.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RenderConfiguration
+    {
+        /// <summary>
+        /// The <see cref="RenderApiType"/> for this configuration.
+        /// </summary>
+        public RenderApiType Api;
+
+        /// <summary>
+        /// An <see cref="OculusSize"/> instance representing the size of the render texture.
+        /// </summary>
+        public OculusSize RTSize;
+
+        /// <summary>
+        /// An <see cref="System.Int32"/> representing the antialiasing sample count.
+        /// </summary>
+        public int Multisample;
+
+        // Platform-specific configuration
+        IntPtr PlatformData0;
+        IntPtr PlatformData1;
+        IntPtr PlatformData2;
+        IntPtr PlatformData3;
+        IntPtr PlatformData4;
+        IntPtr PlatformData5;
+        IntPtr PlatformData6;
+        IntPtr PlatformData7;
+    }
+
+    /// <summary>
+    /// A platform-independent texture description for
+    /// <see cref="OculusRift.EndFrame" />.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct OculusTexture
+    {
+        /// <summary>
+        /// The <see cref="RenderApiType"/> for this configuration.
+        /// </summary>
+        public RenderApiType Api;
+
+        /// <summary>
+        /// An <see cref="OculusSize"/> instance representing the size of this texture.
+        /// </summary>
+        public OculusSize TextureSize;
+
+        /// <summary>
+        /// Pixel viewport in texture that holds eye image.
+        /// </summary>
+        public OculusRectangle RenderViewport;
+
+        // Platform-specific configuration
+        IntPtr PlatformData0;
+        IntPtr PlatformData1;
+        IntPtr PlatformData2;
+        IntPtr PlatformData3;
+        IntPtr PlatformData4;
+        IntPtr PlatformData5;
+        IntPtr PlatformData6;
+        IntPtr PlatformData7;
     }
 
     #endregion
