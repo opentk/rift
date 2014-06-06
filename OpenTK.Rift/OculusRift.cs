@@ -37,7 +37,6 @@ using System.Threading;
 
 namespace OpenTK
 {
-    using OVR_Instance = IntPtr;
     using ovrHmd = IntPtr;
 
     /// <summary>
@@ -45,9 +44,17 @@ namespace OpenTK
     /// </summary>
     public class OculusRift : IDisposable
     {
+        const string lib = "OVR";
+
         static int instance_count;
         static Toolkit opentk;
         bool disposed;
+
+        // For compatibility with the old 0.2.x API
+        IntPtr instance;
+        HMDisplayDescription description;
+        float prediction_delta;
+        bool prediction_enabled;
 
         #region Constructors
 
@@ -83,6 +90,7 @@ namespace OpenTK
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenTK.OculusRift"/> class.
         /// </summary>
+        [Obsolete("Use the new official C-API instead via the static methods of this class.")]
         public OculusRift()
         {
             if (Interlocked.Increment(ref instance_count) == 1)
@@ -93,11 +101,21 @@ namespace OpenTK
                     throw new NotSupportedException("OculusRift failed to initialize");
                 }
             }
+
+            int count = Detect();
+            if (count > 0)
+            {
+                instance = Create(0);
+                if (instance != IntPtr.Zero)
+                {
+                    GetDescription(instance, out description);
+                }
+            }
         }
 
         #endregion
 
-        #region Public Members
+        #region Obsolete Members
 
         /// <summary>
         /// Gets a value indicating whether this instance is connected
@@ -109,10 +127,10 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return instance != IntPtr.Zero;
             }
         }
-            
+
         /// <summary>
         /// Gets the x-coordinate of the Oculus Rift display device,
         /// in global desktop coordinates (px).
@@ -123,7 +141,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return description.WindowPos.X;
             }
         }
 
@@ -137,7 +155,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return description.WindowPos.Y;
             }
         }
 
@@ -152,7 +170,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return description.Resolution.Width;
             }
         }
 
@@ -166,7 +184,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return description.Resolution.Height;
             }
         }
 
@@ -181,7 +199,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return 0.14976f;
             }
         }
 
@@ -196,7 +214,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return 0.0935f;
             }
         }
 
@@ -210,7 +228,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return VScreenSize / 2;
             }
         }
 
@@ -224,7 +242,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return 0.0635f;
             }
         }
 
@@ -237,7 +255,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return 0.064f;
             }
         }
 
@@ -252,7 +270,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return 0.041f;
             }
         }
 
@@ -266,7 +284,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return new Vector4(1.0f, 0.22f, 0.24f, 0.0f);
             }
         }
 
@@ -279,7 +297,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return new Vector4(0.996f, -0.004f, 1.014f, 0.0f);
             }
         }
 
@@ -300,7 +318,8 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                var state = GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                return state.Recorded.Pose.Orientation;
             }
         }
 
@@ -315,7 +334,8 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                var state = GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                return state.Predicted.Pose.Orientation;
             }
         }
 
@@ -329,7 +349,8 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                var state = GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                return state.Recorded.AngularAcceleration;
             }
         }
 
@@ -343,7 +364,8 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                var state = GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                return state.Recorded.AngularVelocity;
             }
         }
 
@@ -356,14 +378,14 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return prediction_delta;
             }
             set
             {
                 CheckDisposed();
                 if (value <= 0)
                     throw new ArgumentOutOfRangeException();
-                throw new NotImplementedException();
+                prediction_delta = value;
             }
         }
 
@@ -376,12 +398,12 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                return prediction_enabled;
             }
             set
             {
                 CheckDisposed();
-                throw new NotImplementedException();
+                prediction_enabled = value;
             }
         }
 
@@ -445,16 +467,25 @@ namespace OpenTK
 
         #endregion
 
-        const string lib = "OVR";
+        #region Public Members
 
         #region OVR Interface
 
+        /// <summary>
+        /// Initializes the Oculus Rift API.
+        /// This function must be called successfully before
+        /// using any Oculus Rift functionality.
+        /// </summary>
+        /// <returns><c>true</c> if the initialize was successful; <c>false</c> otherwise.</returns>
         [DllImport(lib, EntryPoint = "ovr_Initialize", CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.I1)]
-        static extern bool Initialize();
+        public static extern bool Initialize();
 
+        /// <summary>
+        /// Shuts down the Oculus Rift API.
+        /// </summary>
         [DllImport(lib, EntryPoint = "ovr_Shutdown", CallingConvention = CallingConvention.Winapi)]
-        static extern void Shutdown();
+        public static extern void Shutdown();
 
         #endregion
 
@@ -1010,6 +1041,8 @@ namespace OpenTK
         public static extern double GetMeasuredLatencyTest2(ovrHmd hmd);
 
         #endregion
+
+        #endregion
     }
 
     #region Enumerations
@@ -1493,7 +1526,7 @@ namespace OpenTK
         /// <summary>
         /// Where monitor window should be on screen or (0,0).
         /// </summary>
-        public OculusPoint WindowsPos;
+        public OculusPoint WindowPos;
 
         /// <summary>
         /// Recommended (default) optical FOV for the left eye.
