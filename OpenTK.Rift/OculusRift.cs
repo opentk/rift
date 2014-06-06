@@ -78,6 +78,10 @@ namespace OpenTK
                 {
                     VR.GetDescription(instance, out description);
                 }
+                else
+                {
+                    throw new NotSupportedException("Failed to open the VR device");
+                }
             }
         }
 
@@ -286,8 +290,15 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
-                return state.Recorded.Pose.Orientation;
+                if (IsConnected)
+                {
+                    var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                    return state.Recorded.Pose.Orientation;
+                }
+                else
+                {
+                    return Quaternion.Identity;
+                }
             }
         }
 
@@ -302,8 +313,15 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
-                return state.Predicted.Pose.Orientation;
+                if (IsConnected)
+                {
+                    var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                    return state.Predicted.Pose.Orientation;
+                }
+                else
+                {
+                    return Quaternion.Identity;
+                }
             }
         }
 
@@ -317,8 +335,15 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
-                return state.Recorded.AngularAcceleration;
+                if (IsConnected)
+                {
+                    var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                    return state.Recorded.AngularAcceleration;
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
             }
         }
 
@@ -332,8 +357,15 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
-                return state.Recorded.AngularVelocity;
+                if (IsConnected)
+                {
+                    var state = VR.GetSensorState(instance, IsPredictionEnabled ? PredictionDelta : 0);
+                    return state.Recorded.AngularVelocity;
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
             }
         }
 
