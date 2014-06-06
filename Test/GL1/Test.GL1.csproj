@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{95544C84-8678-4DC6-A5CB-015879E31681}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>OpenTK.Rift.Test</RootNamespace>
@@ -28,13 +26,10 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Reference Include="OpenTK">
-      <HintPath>..\..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="System.Drawing" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Reference Include="OpenTK">
+      <HintPath>..\..\packages\OpenTK.1.1.1589.5941\lib\NET40\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OculusCamera.cs" />
@@ -59,5 +54,8 @@
       <Project>{73CDE2A5-3287-4D55-845D-A10BBE33F8CD}</Project>
       <Name>OpenTK.Rift</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

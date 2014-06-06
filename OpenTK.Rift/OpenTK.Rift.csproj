@@ -82,12 +82,9 @@
       <Link>README.md</Link>
     </None>
     <None Include="Wrapper\CMakeLists.txt" />
-    <None Include="Wrapper\OVR_wrapper.cpp" />
-    <None Include="Wrapper\OVR_wrapper.h" />
     <None Include="OpenTK.Rift.dll.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
     <None Include="LibOVR\Src\OVR_CAPI.cpp" />
     <None Include="LibOVR\Src\OVR_CAPI.h" />
     <None Include="LibOVR\Src\OVR_CAPI_GL.h" />
@@ -396,12 +393,13 @@
     <None Include="LibOVR\Src\CAPI\D3D1X\CAPI_D3D9_DistortionRenderer.cpp" />
     <None Include="LibOVR\Src\CAPI\D3D1X\CAPI_D3D9_DistortionRenderer.h" />
     <None Include="LibOVR\Src\CAPI\D3D1X\CAPI_D3D9_Util.cpp" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="OpenTK">
-      <HintPath>..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="OpenTK">
+      <HintPath>..\packages\OpenTK.1.1.1589.5941\lib\NET40\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="LibOVR\Src\" />

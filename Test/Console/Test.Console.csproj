@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{EBFBC079-3357-4707-94E7-26BB904DF4E8}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>OpenTK.Rift.TestConsole</RootNamespace>
@@ -33,7 +31,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="OpenTK">
-      <HintPath>..\..\packages\OpenTK.1.1.1508.5724\lib\NET40\OpenTK.dll</HintPath>
+      <HintPath>..\..\packages\OpenTK.1.1.1589.5941\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
