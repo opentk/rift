@@ -15,6 +15,7 @@ namespace OpenTK.Rift.TestConsole
                         int left = Console.CursorLeft;
                         int top = Console.CursorTop;
 
+                        Console.WriteLine("Obsolete API:");
                         Console.WriteLine("Orientation (quaternion):     {0}", ovr.Orientation);
                         Console.WriteLine("Orientation (axis-angle):     {0}", ovr.Orientation.ToAxisAngle());
                         Console.WriteLine("Acceleration (m/s^2):         {0}", ovr.Acceleration);
