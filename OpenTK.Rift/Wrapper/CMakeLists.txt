@@ -9,8 +9,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../LibOVR/Src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SRC ${SRC}
+  #OVR_wrapper.cpp # we are going to use the upstream CAPI instead
   ../LibOVR/Src/OVR_CAPI.cpp
-  ../LibOVR/Src/OVR_Common_HMDDevice.cpp
+  #../LibOVR/Src/OVR_Common_HMDDevice.cpp # not included in upstream project files
   ../LibOVR/Src/OVR_DeviceHandle.cpp
   ../LibOVR/Src/OVR_DeviceImpl.cpp
   ../LibOVR/Src/OVR_JSON.cpp
@@ -50,7 +51,7 @@ set (SRC ${SRC}
   ../LibOVR/Src/Kernel/OVR_System.cpp
   ../LibOVR/Src/Kernel/OVR_Timer.cpp
   ../LibOVR/Src/Kernel/OVR_UTF8Util.cpp
-  OVR_wrapper.cpp)
+)
 
 if (WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
@@ -100,8 +101,10 @@ if (APPLE)
   find_library(MAC_APPSERVICES NAMES ApplicationServices)
   find_library(MAC_CF NAMES CoreFoundation)
   find_library(MAC_IOKIT NAMES IOKit)
+  find_library(MAC_OPENGL OpenGL)
   target_link_libraries(${PROJECT_NAME}
     ${MAC_APPSERVICES}
     ${MAC_CF}
-    ${MAC_IOKIT})
+    ${MAC_IOKIT}
+    ${MAC_OPENGL})
 endif ()
