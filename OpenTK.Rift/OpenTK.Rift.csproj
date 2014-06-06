@@ -18,9 +18,9 @@
     <CMakeArgs_x86>$(CMakeExtraArgs_x86) -DPROJECT_NAME=OVR -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x86/ ../../../Wrapper</CMakeArgs_x86>
     <CMakeArgs_x64>$(CMakeExtraArgs_x64) -DPROJECT_NAME=OVR -DCMAKE_BUILD_TYPE=$(Configuration) -DINSTALL_DIR:PATH=../../../../bin/$(Configuration)/lib/x64/ ../../../Wrapper</CMakeArgs_x64>
     <CMakeInstallArgs>--build . --config $(Configuration) --target install</CMakeInstallArgs>
-    <CMake_x86>cmake $(CMakeArgs_x86)</CMake_x86>
-    <CMake_x64>cmake $(CMakeArgs_x64)</CMake_x64>
-    <CMakeInstall>cmake $(CMakeInstallArgs)</CMakeInstall>
+    <CMake_x86>((cmake $(CMakeArgs_x86)) || (/usr/local/bin/cmake $(CMakeArgs_x86)))</CMake_x86>
+    <CMake_x64>((cmake $(CMakeArgs_x64)) || (/usr/local/bin/cmake $(CMakeArgs_x64)))</CMake_x64>
+    <CMakeInstall>((cmake $(CMakeInstallArgs)) || (/usr/local/bin/cmake $(CMakeInstallArgs)))</CMakeInstall>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
