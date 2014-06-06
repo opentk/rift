@@ -51,6 +51,11 @@ set (SRC ${SRC}
   ../LibOVR/Src/Kernel/OVR_System.cpp
   ../LibOVR/Src/Kernel/OVR_Timer.cpp
   ../LibOVR/Src/Kernel/OVR_UTF8Util.cpp
+  ../LibOVR/Src/Util/Util_ImageWindow.cpp
+  ../LibOVR/Src/Util/Util_Interface.cpp
+  ../LibOVR/Src/Util/Util_LatencyTest.cpp
+  ../LibOVR/Src/Util/Util_LatencyTest2.cpp
+  ../LibOVR/Src/Util/Util_Render_Stereo.cpp
 )
 
 if (WIN32)
