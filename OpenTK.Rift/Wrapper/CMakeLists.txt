@@ -9,27 +9,43 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../LibOVR/Src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SRC ${SRC}
+  ../LibOVR/Src/OVR_CAPI.cpp
+  ../LibOVR/Src/OVR_Common_HMDDevice.cpp
   ../LibOVR/Src/OVR_DeviceHandle.cpp
   ../LibOVR/Src/OVR_DeviceImpl.cpp
   ../LibOVR/Src/OVR_JSON.cpp
   ../LibOVR/Src/OVR_LatencyTestImpl.cpp
   ../LibOVR/Src/OVR_Profile.cpp
+  ../LibOVR/Src/OVR_Recording.cpp
+  ../LibOVR/Src/OVR_Sensor2Impl.cpp
+  ../LibOVR/Src/OVR_SensorCalibration.cpp
   ../LibOVR/Src/OVR_SensorFilter.cpp
   ../LibOVR/Src/OVR_SensorFusion.cpp
   ../LibOVR/Src/OVR_SensorImpl.cpp
+  ../LibOVR/Src/OVR_SensorImpl_Common.cpp
+  ../LibOVR/Src/OVR_SensorTimeFilter.cpp
+  ../LibOVR/Src/OVR_Stereo.cpp
   ../LibOVR/Src/OVR_ThreadCommandQueue.cpp
+  ../LibOVR/Src/CAPI/CAPI_DistortionRenderer.cpp
+  ../LibOVR/Src/CAPI/CAPI_FrameTimeManager.cpp
+  ../LibOVR/Src/CAPI/CAPI_GlobalState.cpp
+  ../LibOVR/Src/CAPI/CAPI_HMDRenderState.cpp
+  ../LibOVR/Src/CAPI/CAPI_HMDState.cpp
+  ../LibOVR/Src/CAPI/GL/CAPI_GL_DistortionRenderer.cpp
+  ../LibOVR/Src/CAPI/GL/CAPI_GL_Util.cpp
   ../LibOVR/Src/Kernel/OVR_Alg.cpp
   ../LibOVR/Src/Kernel/OVR_Allocator.cpp
   ../LibOVR/Src/Kernel/OVR_Atomic.cpp
   ../LibOVR/Src/Kernel/OVR_File.cpp
   ../LibOVR/Src/Kernel/OVR_FileFILE.cpp
+  ../LibOVR/Src/Kernel/OVR_Lockless.cpp
   ../LibOVR/Src/Kernel/OVR_Log.cpp
   ../LibOVR/Src/Kernel/OVR_Math.cpp
   ../LibOVR/Src/Kernel/OVR_RefCount.cpp
   ../LibOVR/Src/Kernel/OVR_Std.cpp
+  ../LibOVR/Src/Kernel/OVR_String.cpp
   ../LibOVR/Src/Kernel/OVR_String_FormatUtil.cpp
   ../LibOVR/Src/Kernel/OVR_String_PathUtil.cpp
-  ../LibOVR/Src/Kernel/OVR_String.cpp
   ../LibOVR/Src/Kernel/OVR_SysFile.cpp
   ../LibOVR/Src/Kernel/OVR_System.cpp
   ../LibOVR/Src/Kernel/OVR_Timer.cpp
