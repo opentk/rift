@@ -9,7 +9,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../LibOVR/Src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SRC ${SRC}
-  #OVR_wrapper.cpp # we are going to use the upstream CAPI instead
   ../LibOVR/Src/OVR_CAPI.cpp
   #../LibOVR/Src/OVR_Common_HMDDevice.cpp # not included in upstream project files
   ../LibOVR/Src/OVR_DeviceHandle.cpp
