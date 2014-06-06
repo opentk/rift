@@ -51,6 +51,35 @@ namespace OpenTK
 
         #region Constructors
 
+        [DllImport("kernel32.dll")]
+        static extern IntPtr LoadLibrary(string filename);
+
+        static OculusRift()
+        {
+            if (Configuration.RunningOnWindows &&
+                !Configuration.RunningOnMono)
+            {
+                // When running on Windows, we need to load the
+                // native library into the address space of the
+                // application. This allows us to use DllImport
+                // to load the correct (x86 or x64) library at
+                // runtime.
+                // Non-windows platforms rely on the dll.config
+                // file to load the correct library.
+
+                if (IntPtr.Size == 4)
+                {
+                    // Running on 32bit system
+                    LoadLibrary("lib/x86/OVR.dll");
+                }
+                else
+                {
+                    // Running on 64bit system
+                    LoadLibrary("lib/x64/OVR.dll");
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenTK.OculusRift"/> class.
         /// </summary>
@@ -59,7 +88,7 @@ namespace OpenTK
             if (Interlocked.Increment(ref instance_count) == 1)
             {
                 opentk = Toolkit.Init();
-                if (!NativeMethods.Initialize())
+                if (!Initialize())
                 {
                     throw new NotSupportedException("OculusRift failed to initialize");
                 }
@@ -395,7 +424,7 @@ namespace OpenTK
                 {
                     if (Interlocked.Decrement(ref instance_count) == 0)
                     {
-                        NativeMethods.Shutdown();
+                        Shutdown();
                         opentk.Dispose();
                         opentk = null;
                     }
@@ -416,355 +445,569 @@ namespace OpenTK
 
         #endregion
 
-        #region NativeMethods
+        const string lib = "OVR";
 
-        static class NativeMethods
+        #region OVR Interface
+
+        [DllImport(lib, EntryPoint = "ovr_Initialize", CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        static extern bool Initialize();
+
+        [DllImport(lib, EntryPoint = "ovr_Shutdown", CallingConvention = CallingConvention.Winapi)]
+        static extern void Shutdown();
+
+        #endregion
+
+        #region HMD Interface
+
+        /// <summary>
+        /// Detects or re-detects HMDs and reports the total number detected.
+        /// Users can get information about each HMD by calling ovrHmd_Create with an index.
+        /// </summary>
+        /// <returns>The total number of HMDs detected.</returns>
+        [DllImport(lib, EntryPoint = "ovrHmd_Detect", CallingConvention = CallingConvention.Winapi)]
+        public static extern int Detect();
+
+        /// <summary>
+        /// Creates a handle to an HMD.
+        /// </summary>
+        /// <param name="index">
+        /// Index of the HMD, between 0 and <see cref="Detect()"/> - 1.
+        /// Note: index mappings can cange after each <see cref="Detect"/>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="System.IntPtr"/> representing a handle to an HMD, or <see cref="System.IntPtr.Zero"/>
+        /// if the specified index is not valid.
+        /// Valid handles must be freed with <see cref="Destroy"/>.
+        /// </returns>
+        [DllImport(lib, EntryPoint = "ovrHmd_Create", CallingConvention = CallingConvention.Winapi)]
+        public static extern ovrHmd Create(int index);
+
+        /// <summary>
+        /// Destroys the specified HMD handle.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle obtained by <see cref="Create"/>.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_Destroy", CallingConvention = CallingConvention.Winapi)]
+        public static extern void Destroy(ovrHmd hmd);
+
+        /// <summary>
+        /// Creates a "fake" HMD used for debugging only. This is not tied to specific hardware,
+        /// but may be used to debug some of the related rendering.
+        /// </summary>
+        /// <returns>A <see cref="System.IntPtr"/> represtenting a debug HMD handle.</returns>
+        /// <param name="type">The desired <see cref="HMDisplayType"/>.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_CreateDebug", CallingConvention = CallingConvention.Winapi)]
+        public static extern ovrHmd CreateDebug(HMDisplayType type);
+
+        /// <summary>
+        /// Returns a string representing the last HMD error.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> representing the last HMD error,
+        /// or <see cref="System.String.Empty"/> if no error has occured.
+        /// </returns>
+        /// <param name="hmd">
+        /// An HMD handle obtained by <see cref="Create"/> or <see cref="CreateDebug"/>,
+        /// or <see cref="System.IntPtr.Zero"/> to obtain the global error state (for <see cref="Initialize"/> etc).
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetLastError", CallingConvention = CallingConvention.Winapi)]
+        static extern IntPtr GetLastError(ovrHmd hmd);
+
+        /// <summary>
+        /// Returns capability bits that are enabled at this time; described by <see cref="HMDisplayCaps"/>.
+        /// Note that this value is different from <see cref="HMDisplayDescription.DisplayCaps"/>,
+        /// which describes what capabilities are available.
+        /// </summary>
+        /// <returns>A bitwise combination of <see cref="HMDisplayCaps"/> flags representing the enabled capabilities.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
+        public static extern HMDisplayCaps GetEnabledCaps(ovrHmd hmd);
+
+        /// <summary>
+        /// Modifies capability bits described by ovrHmdCaps that can be modified,
+        /// such as ovrHmd_LowPersistance.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="hmdCaps">A bitwise combination of the <see cref="HMDisplayCaps"/> flags to enable</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_SetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
+        public static extern void SetEnabledCaps(ovrHmd hmd, HMDisplayCaps hmdCaps);
+
+        #endregion
+
+        #region Sensor Interface
+
+        /// <summary>
+        /// Starts sensor sampling, enabling specified capabilities, described by <see cref="SensorCaps"/>.
+        /// </summary>
+        /// <returns><c>true</c>, if sensor was started, <c>false</c> otherwise.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="supportedSensorCaps">
+        /// Sensor capabilities that are requested at the time of the call. The function will succeed 
+        /// even if these caps are not available (i.e. sensor or camera is unplugged). Support
+        /// will automatically be enabled if such device is plugged in later. Software should
+        /// check ovrSensorState.StatusFlags for real-time status.
+        /// </param>
+        /// <param name="requiredSensorCaps">
+        /// Sensor capabilities required at the time of the call.
+        /// If they are not available, the function will fail. Pass 0 if only specifying
+        /// supportedSensorCaps.
+        /// </param>
+        /// <remarks>
+        /// All sensor interface functions are thread-safe, allowing sensor state to be sampled
+        /// from different threads.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_StartSensor", CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool StartSensor(ovrHmd hmd,
+            SensorCaps supportedSensorCaps,
+            SensorCaps requiredSensorCaps);
+
+        /// <summary>
+        /// Stops sensor sampling, shutting down internal resources.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <remarks>
+        /// All sensor interface functions are thread-safe, allowing sensor state to be sampled
+        /// from different threads.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_StopSensor", CallingConvention = CallingConvention.Winapi)]
+        public static extern void StopSensor(ovrHmd hmd);
+
+        /// <summary>
+        /// Resets sensor orientation.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <remarks>
+        /// All sensor interface functions are thread-safe, allowing sensor state to be sampled
+        /// from different threads.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_ResetSensor", CallingConvention = CallingConvention.Winapi)]
+        public static extern void ResetSensor(ovrHmd hmd);
+
+        /// <summary>
+        /// Returns sensor state reading based on the specified absolute system time.
+        /// </summary>
+        /// <returns>The sensor state.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="absTime">
+        /// Pass absTime value of 0.0 to request the most recent sensor reading; in this case
+        /// both PredictedPose and SamplePose will have the same value.
+        /// </param>
+        /// <remarks>
+        /// All sensor interface functions are thread-safe, allowing sensor state to be sampled
+        /// from different threads.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetSensorState", CallingConvention = CallingConvention.Winapi)]
+        public static extern SensorState GetSensorState(ovrHmd hmd, double absTime);
+
+        /// <summary>
+        /// Returns information about a sensor.
+        /// Only valid after StartSensor.
+        /// </summary>
+        /// <returns><c>true</c>, if a sensor desc was obtained successfully; <c>false</c> otherwise.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="descOut">
+        /// A non-null <see cref="System.Text.StringBuilder"/> instance.
+        /// After a successful call, this will hold the sensor description.
+        /// </param>
+        /// <remarks>
+        /// All sensor interface functions are thread-safe, allowing sensor state to be sampled
+        /// from different threads.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetSensorDesc", CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool GetSensorDescription(ovrHmd hmd, StringBuilder descOut);
+
+        #endregion
+
+        #region Graphics Setup
+
+        /// <summary>
+        /// Fills in description about HMD; this is the same as filled in by <see cref="Create"/>.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="desc">A <see cref="HMDisplayDescription"/> instance containing information about an HMD.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetDesc", CallingConvention = CallingConvention.Winapi)]
+        public static extern void GetDescription(ovrHmd hmd, out HMDisplayDescription desc);
+
+        /// <summary>
+        /// Gets the recommended texture size for a single eye and given FOV cone.
+        /// Higher FOV will generally require larger textures to maintain quality.
+        /// </summary>
+        /// <returns>The recommended texture size for the specified FOV cone.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
+        /// <param name="fov">A <see cref="FovPort"/> instance specifying the desired FOV cone.</param>
+        /// <param name="pixelsPerDisplayPixel">
+        /// Specifies that number of render target pixels per display
+        /// pixel at center of distortion; 1.0 is the default value. Lower values
+        /// can improve performance.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetFovTextureSize", CallingConvention = CallingConvention.Winapi)]
+        public static extern OculusSize GetFovTextureSize(ovrHmd hmd, EyeType eye, FovPort fov,
+            float pixelsPerDisplayPixel);
+
+        #endregion
+
+        #region SDK Rendering
+
+        /// <summary>
+        /// Configures rendering; fills in computed render parameters.
+        /// This function can be called multiple times to change rendering settings.
+        /// Pass in two eye view descriptors to generate complete rendering information
+        /// for each eye.
+        /// </summary>
+        /// <returns><c>true</c>, if rendering was configured successfully; <c>false</c> otherwise.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="apiConfig">
+        /// Provides D3D/OpenGL specific parameters. Pass null
+        /// to shutdown rendering and release all resources.
+        /// </param>
+        /// <param name="distortionCaps">
+        /// A bitwise combination of <see cref="DistortionCaps"/> flags
+        /// that describe the distortion settings that will be applied.
+        /// </param>
+        /// <param name="eyeFovIn">An array of 2 <see cref="FovPort"/> instances in.</param>
+        /// <param name="eyeRenderDescOut">
+        /// When the function returns successfully, contains two <see cref="EyeRenderDescription"/>
+        /// instances describing the rendering settings for each eye.
+        /// </param>
+        /// <remarks>
+        /// This function support rendering of distortion by the SDK through direct
+        /// access to the underlying rendering HW, such as D3D or GL.
+        /// This is the recommended approach, as it allows for better support or future
+        /// Oculus hardware and a range of low-level optimizations.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_ConfigureRendering", CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool ConfigureRendering(ovrHmd hmd,
+            ref RenderConfiguration apiConfig,
+            DistortionCaps distortionCaps,
+            [MarshalAs(UnmanagedType.LPArray, SizeConst=2)] FovPort[] eyeFovIn,
+            [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] EyeRenderDescription[] eyeRenderDescOut);
+
+        /// <summary>
+        /// Begins a frame, returning timing and orientation information useful for simulation.
+        /// This should be called in the beginning of game rendering loop (on render thread).
+        /// This function relies on <see cref="BeginFrameTiming"/> for some of its functionality.
+        /// </summary>
+        /// <returns>A <see cref="FrameTiming"/> instance.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="frameIndex">The frame index. Pass 0 for frame index if not using GetFrameTiming.</param>
+        /// <remarks>
+        /// This function support rendering of distortion by the SDK through direct
+        /// access to the underlying rendering HW, such as D3D or GL.
+        /// This is the recommended approach, as it allows for better support or future
+        /// Oculus hardware and a range of low-level optimizations.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_BeginFrame", CallingConvention = CallingConvention.Winapi)]
+        public static extern FrameTiming BeginFrame(ovrHmd hmd, int frameIndex);
+
+        /// <summary>
+        /// Ends frame, rendering textures to frame buffer. This may perform distortion and scaling
+        /// internally, assuming is it not delegated to another thread. 
+        /// Must be called on the same thread as BeginFrame. Calls <see cref="BeginFrameTiming"/> internally.
+        /// Note: this Function will call SwapBuffers() and potentially wait for VSync.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <remarks>
+        /// This function support rendering of distortion by the SDK through direct
+        /// access to the underlying rendering HW, such as D3D or GL.
+        /// This is the recommended approach, as it allows for better support or future
+        /// Oculus hardware and a range of low-level optimizations.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_EndFrame", CallingConvention = CallingConvention.Winapi)]
+        public static extern void EndFrame(ovrHmd hmd);
+
+        /// <summary>
+        /// Marks beginning of eye rendering. Must be called on the same thread as BeginFrame.
+        /// This function uses ovrHmd_GetEyePose to predict sensor state that should be
+        /// used rendering the specified eye.
+        /// This combines current absolute time with prediction that is appropriate for this HMD.
+        /// It is ok to call BeginEyeRender() on both eyes before calling <see cref="EndEyeRender"/>.
+        /// If rendering one eye at a time, it is best to render eye specified by
+        /// <see cref="HMDisplayDescription.EyeRenderOrderFirst"/> first.
+        /// </summary>
+        /// <returns>An <see cref="OculusPose"/> instance.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
+        /// <remarks>
+        /// This function support rendering of distortion by the SDK through direct
+        /// access to the underlying rendering HW, such as D3D or GL.
+        /// This is the recommended approach, as it allows for better support or future
+        /// Oculus hardware and a range of low-level optimizations.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_BeginEyeRender", CallingConvention = CallingConvention.Winapi)]
+        public static extern OculusPose BeginEyeRender(ovrHmd hmd, EyeType eye);
+
+        /// <summary>
+        /// Marks the end of eye rendering and submits the eye texture for display after it is ready.
+        /// Rendering viewport within the texture can change per frame if necessary.
+        /// Specified texture may be presented immediately or wait until <see cref="EndFrame"/> based
+        /// on the implementation. The API performs distortion and scaling internally.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
+        /// <param name="renderPose">
+        /// A <see cref="OculusPose"/> returned by <see cref="BeginEyeRender"/>
+        /// or a custom <see cref="OculusPose"/>.
+        /// </param>
+        /// <param name="eyeTexture">The <see cref="OculusTexture"/> to render.</param>
+        /// <remarks>
+        /// This function support rendering of distortion by the SDK through direct
+        /// access to the underlying rendering HW, such as D3D or GL.
+        /// This is the recommended approach, as it allows for better support or future
+        /// Oculus hardware and a range of low-level optimizations.
+        /// </remarks>
+        [DllImport(lib, EntryPoint = "ovrHmd_EndEyeRender", CallingConvention = CallingConvention.Winapi)]
+        public static extern void EndEyeRender(ovrHmd hmd, EyeType eye,
+            OculusPose renderPose, ref OculusTexture eyeTexture);
+
+        #endregion
+
+        #region Game-Side Rendering Functions
+
+        // These functions provide distortion data and render timing support necessary to allow
+        // game rendering of distortion. Game-side rendering involves the following steps:
+        //
+        //  1. Setup ovrEyeDesc based on desired texture size and Fov.
+        //     Call ovrHmd_GetRenderDesc to get the necessary rendering parameters for each eye.
+        // 
+        //  2. Use ovrHmd_CreateDistortionMesh to generate distortion mesh.
+        //
+        //  3. Use ovrHmd_BeginFrameTiming, ovrHmd_GetEyePose and ovrHmd_BeginFrameTiming
+        //     in the rendering loop to obtain timing and predicted view orientation for
+        //     each eye.
+        //      - If relying on timewarp, use ovr_WaitTillTime after rendering+flush, followed
+        //        by ovrHmd_GetEyeTimewarpMatrices to obtain timewarp matrices used 
+        //        in distortion pixel shader to reduce latency.
+        //
+
+        /// <summary>
+        /// Computes distortion viewport, view adjust and other rendering for the specified
+        /// eye. This can be used instead of <see cref="ConfigureRendering"/> to help setup rendering on
+        /// the game side.
+        /// </summary>
+        /// <returns>A <see cref="EyeRenderDescription"/> instance.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eyeType">The <see cref="EyeType"/> for the left or right eye.</param>
+        /// <param name="fov">The desired <see cref="FovPort"/> configuration.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetRenderDesc", CallingConvention = CallingConvention.Winapi)]
+        public static extern EyeRenderDescription GetRenderDescription(ovrHmd hmd,
+            EyeType eyeType, FovPort fov);
+
+        /// <summary>
+        /// Generate distortion mesh per eye.
+        /// Distortion capabilities will depend on 'distortionCaps' flags; user should rely on
+        /// appropriate shaders based on their settings.
+        /// Distortion mesh data will be allocated and stored into the <see cref="DistortionMesh"/> data structure,
+        /// which should be explicitly freed with <see cref="DestroyDistortionMesh"/>.
+        /// Users should call <see cref="GetRenderScaleAndOffset"/> to get uvScale and Offset values for rendering.
+        /// The function shouldn't fail unless theres is a configuration or memory error, in which case
+        /// <see cref="DistortionMesh"/> values will be set to null.
+        /// </summary>
+        /// <returns><c>true</c>, if the <see cref="DistortionMesh"/> was successfully created, <c>false</c> otherwise.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eyeType">The <see cref="EyeType"/> for the left or right eye.</param>
+        /// <param name="fov">The desired <see cref="FovPort"/> configuration.</param>
+        /// <param name="distortionCaps">A bitwise combination of <see cref="DistortionCaps"/> flags.</param>
+        /// <param name="meshData">
+        /// When this function returns successfully, contains a <see cref="DistortionMesh"/> instance.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_CreateDistortionMesh", CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool CreateDistortionMesh(ovrHmd hmd,
+            EyeType eyeType, FovPort fov,
+            DistortionCaps distortionCaps,
+            out DistortionMesh meshData);
+
+        /// <summary>
+        /// Frees a distortion mesh allocated by <see cref="CreateDistortionMesh"/>.
+        /// </summary>
+        /// <param name="meshData">
+        /// The <see cref="DistortionMesh"/> to destroy.
+        /// All meshData properties are cleared after this call returns.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_DestroyDistortionMesh", CallingConvention = CallingConvention.Winapi)]
+        public static extern void DestroyDistortionMesh(ref DistortionMesh meshData);
+
+        /// <summary>
+        /// Computes updated 'uvScaleOffsetOut' to be used with a distortion if render target size or
+        /// viewport changes after the fact. This can be used to adjust render size every frame, if desired.
+        /// </summary>
+        /// <param name="fov">The desired <see cref="FovPort"/> configuration.</param>
+        /// <param name="textureSize">The desired texture size.</param>
+        /// <param name="renderViewport">The desired render viewport.</param>
+        /// <param name="uvScaleOffsetOut">Returns the uv scale offset for each eye.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetRenderScaleAndOffset", CallingConvention = CallingConvention.Winapi)]
+        public static extern void GetRenderScaleAndOffset(FovPort fov,
+            OculusSize textureSize, OculusRectangle renderViewport,
+            [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Vector2[] uvScaleOffsetOut);
+
+        /// <summary>
+        /// Thread-safe timing function for the main thread. Caller should increment frameIndex
+        /// with every frame and pass the index to RenderThread for processing.
+        /// </summary>
+        /// <returns>A <see cref="FrameTiming"/> instance.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="frameIndex">
+        /// A monotonously increasing frame index.
+        /// The user is responsible for incrementing this value on every frame.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetFrameTiming", CallingConvention = CallingConvention.Winapi)]
+        public static extern FrameTiming GetFrameTiming(ovrHmd hmd, int frameIndex);
+
+        /// <summary>
+        /// Marks the beginning of the frame on the Render Thread.
+        /// </summary>
+        /// <returns>A <see cref="FrameTiming"/> instance.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="frameIndex">
+        /// Pass 0 if <see cref="GetFrameTiming"/> is not being used. Otherwise,
+        /// pass the same frame index as was used for GetFrameTiming on the main thread.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_BeginFrameTiming", CallingConvention = CallingConvention.Winapi)]
+        public static extern FrameTiming BeginFrameTiming(ovrHmd hmd, int frameIndex);
+
+        /// <summary>
+        /// Marks the end of game-rendered frame, tracking the necessary timing information. This
+        /// function must be called immediately after Present/SwapBuffers + GPU sync. GPU sync is important
+        /// before this call to reduce latency and ensure proper timing.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_EndFrameTiming", CallingConvention = CallingConvention.Winapi)]
+        public static extern void EndFrameTiming(ovrHmd hmd);
+
+        /// <summary>
+        /// Initializes and resets frame time tracking. This is typically not necessary, but
+        /// is helpful if game changes VSync state or video mode. VSync is assumed to be enabled if this
+        /// isn't called.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="frameIndex">Specifies the frame index to reset to.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_ResetFrameTiming", CallingConvention = CallingConvention.Winapi)]
+        public static extern void ResetFrameTiming(ovrHmd hmd, int frameIndex);
+
+        /// <summary>
+        /// Predicts and returns Pose that should be used rendering the specified eye.
+        /// Must be called between <see cref="BeginFrameTiming"/> and <see cref="EndFrameTiming"/>.
+        /// </summary>
+        /// <returns>The estimated <see cref="OculusPose"/> instance.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetEyePose", CallingConvention = CallingConvention.Winapi)]
+        public static extern OculusPose GetEyePose(ovrHmd hmd, EyeType eye);
+
+        /// <summary>
+        /// Computes timewarp matrices used by distortion mesh shader, these are used to adjust
+        /// for orientation change since the last call to ovrHmd_GetEyePose for this eye.
+        /// The <see cref="DistortionVertex.TimeWarpFactor"/> is used to blend between the matrices,
+        /// usually representing two different sides of the screen.
+        /// Must be called on the same thread as <see cref="BeginFrameTiming"/>.
+        /// </summary>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
+        /// <param name="renderPose">The desired <see cref="OculusPose"/>.</param>
+        /// <param name="twmOut">
+        /// Returns two <see cref="OpenTK.Matrix4"/> instances, representing
+        /// the timewarp matrix for each eye.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetEyeTimewarpMatrices", CallingConvention = CallingConvention.Winapi)]
+        public static extern void GetEyeTimewarpMatrices(ovrHmd hmd, EyeType eye,
+            OculusPose renderPose, [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Matrix4[] twmOut);
+
+        #endregion
+
+        #region Stateless math setup functions
+
+        /// <summary>
+        /// Calculates the projection matrix for the specified fov, znear, zfar and rightHanded.
+        /// </summary>
+        /// <param name="fov">The desired <see cref="FovPort"/>.</param>
+        /// <param name="znear">The desired near z-plane.</param>
+        /// <param name="zfar">The desired far z-plane.</param>
+        /// <param name="rightHanded">
+        /// If set to <c>true</c> the returned matrix will be right handed.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrMatrix4f_Projection", CallingConvention = CallingConvention.Winapi)]
+        public static extern Matrix4 Projection(FovPort fov,
+            float znear, float zfar, [MarshalAs(UnmanagedType.I1)] bool rightHanded);
+
+        /// <summary>
+        /// Used for 2D rendering, Y is down
+        /// </summary>
+        /// <returns>An <see cref="OpenTK.Matrix4"/> represensting an orthographic projection matrix.</returns>
+        /// <param name="projection">The parent projection matrix, returned by <see cref="Projection"/>.</param>
+        /// <param name="orthoScale">The x/y scale for the orthographic projection (1.0f / pixelsPerTanAngleAtCenter)</param>
+        /// <param name="orthoDistance">The distance of the projection plane from the camera (e.g. 0.8m).</param>
+        /// <param name="eyeViewAdjustX">X eye adjustment factor.</param>
+        [DllImport(lib, EntryPoint = "ovrMatrix4f_OrthoSubProjection", CallingConvention = CallingConvention.Winapi)]
+        public static extern Matrix4 OrthoSubProjection(Matrix4 projection, Vector2 orthoScale,
+            float orthoDistance, float eyeViewAdjustX);
+
+        /// <summary>
+        /// Returns global, absolute high-resolution time in seconds. This is the same
+        /// value as used in sensor messages.
+        /// </summary>
+        /// <returns>The time in seconds.</returns>
+        [DllImport(lib, EntryPoint = "ovr_GetTimeInSeconds", CallingConvention = CallingConvention.Winapi)]
+        public static extern double GetTimeInSeconds();
+
+        /// <summary>
+        /// Waits until the specified absolute time.
+        /// </summary>
+        /// <returns>The absolute time that was waited.</returns>
+        /// <param name="absTime">The absolute time to wait.</param>
+        [DllImport(lib, EntryPoint = "ovr_WaitTillTime", CallingConvention = CallingConvention.Winapi)]
+        public static extern double WaitTillTime(double absTime);
+
+        #endregion
+
+        #region Latency Test interface
+
+        /// <summary>
+        /// Performs latency test processing and returns 'TRUE' if specified rgb color should
+        /// be used to clear the screen.
+        /// </summary>
+        /// <returns><c>true</c>, if the latency test conluded successfully, <c>false</c> otherwise.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        /// <param name="rgbColorOut">
+        /// When this function returns successfully, contains the optimal RGB color
+        /// for clearing the screen.
+        /// </param>
+        [DllImport(lib, EntryPoint = "ovrHmd_ProcessLatencyTest", CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool ProcessLatencyTest(ovrHmd hmd,
+            [Out][MarshalAs(UnmanagedType.LPStr, SizeConst = 3)] byte rgbColorOut);
+
+        /// <summary>
+        /// Returns the results of the latency test. This is a blocking call.
+        /// </summary>
+        /// <returns>A pointer to a null-terminated string that contains the results of the latency test.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetLatencyTestResult", CallingConvention = CallingConvention.Winapi)]
+        public static extern IntPtr GetLatencyTestResultPointer(ovrHmd hmd);
+
+        /// <summary>
+        /// Returns the results of the latency test. This is a blocking call.
+        /// Note: this function allocates memory.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that contains the results of the latency test.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        public static string GetLatencyTestResult(ovrHmd hmd)
         {
-            const string lib = "OVR";
-
-            static NativeMethods()
-            {
-                if (Configuration.RunningOnWindows &&
-                    !Configuration.RunningOnMono)
-                {
-                    // When running on Windows, we need to load the
-                    // native library into the address space of the
-                    // application. This allows us to use DllImport
-                    // to load the correct (x86 or x64) library at
-                    // runtime.
-                    // Non-windows platforms rely on the dll.config
-                    // file to load the correct library.
-
-                    if (IntPtr.Size == 4)
-                    {
-                        // Running on 32bit system
-                        LoadLibrary("lib/x86/OVR.dll");
-                    }
-                    else
-                    {
-                        // Running on 64bit system
-                        LoadLibrary("lib/x64/OVR.dll");
-                    }
-                }
-            }
-
-            [DllImport("kernel32.dll")]
-            static extern IntPtr LoadLibrary(string filename);
-
-            #region OVR Interface
-
-            [DllImport(lib, EntryPoint = "ovr_Initialize", CallingConvention = CallingConvention.Winapi)]
-            [return: MarshalAs(UnmanagedType.I1)]
-            public static extern bool Initialize();
-
-            [DllImport(lib, EntryPoint = "ovr_Shutdown", CallingConvention = CallingConvention.Winapi)]
-            public static extern void Shutdown();
-
-            #endregion
-
-            #region HMD Interface
-
-            // Detects or re-detects HMDs and reports the total number detected.
-            // Users can get information about each HMD by calling ovrHmd_Create with an index.
-            [DllImport(lib, EntryPoint = "ovrHmd_Detect", CallingConvention = CallingConvention.Winapi)]
-            public static extern int Detect();
-
-            // Creates a handle to an HMD and optionally fills in data about it.
-            // Index can [0 .. ovrHmd_Detect()-1]; index mappings can cange after each ovrHmd_Detect call.
-            // If not null, returned handle must be freed with ovrHmd_Destroy.
-            [DllImport(lib, EntryPoint = "ovrHmd_Create", CallingConvention = CallingConvention.Winapi)]
-            public static extern ovrHmd Create(int index);
-
-            [DllImport(lib, EntryPoint = "ovrHmd_Destroy", CallingConvention = CallingConvention.Winapi)]
-            public static extern void Destroy(ovrHmd hmd);
-
-            // Creates a "fake" HMD used for debugging only. This is not tied to specific hardware,
-            // but may be used to debug some of the related rendering.
-            [DllImport(lib, EntryPoint = "ovrHmd_CreateDebug", CallingConvention = CallingConvention.Winapi)]
-            public static extern ovrHmd CreateDebug(HMDisplayType type);
-
-            // Returns last error for HMD state. Returns null for no error.
-            // String is valid until next call or GetLastError or HMD is destroyed.
-            // Pass null hmd to get global error (for create, etc).
-            [DllImport(lib, EntryPoint = "ovrHmd_GetLastError", CallingConvention = CallingConvention.Winapi)]
-            static extern IntPtr GetLastError(ovrHmd hmd);
-
-            // Returns capability bits that are enabled at this time; described by ovrHmdCaps.
-            // Note that this value is different font ovrHmdDesc::HmdCaps, which describes what
-            // capabilities are available.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
-            public static extern HMDisplayCaps GetEnabledCaps(ovrHmd hmd);
-
-            // Modifies capability bits described by ovrHmdCaps that can be modified,
-            // such as ovrHmd_LowPersistance.
-            [DllImport(lib, EntryPoint = "ovrHmd_SetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
-            public static extern void SetEnabledCaps(ovrHmd hmd, HMDisplayCaps hmdCaps);
-
-            #endregion
-
-            #region Sensor Interface
-
-            // All sensor interface functions are thread-safe, allowing sensor state to be sampled
-            // from different threads.
-            // Starts sensor sampling, enabling specified capabilities, described by ovrSensorCaps.
-            //  - supportedSensorCaps specifies support that is requested. The function will succeed 
-            //    even if these caps are not available (i.e. sensor or camera is unplugged). Support
-            //    will automatically be enabled if such device is plugged in later. Software should
-            //    check ovrSensorState.StatusFlags for real-time status.
-            //  - requiredSensorCaps specify sensor capabilities required at the time of the call.
-            //    If they are not available, the function will fail. Pass 0 if only specifying
-            //    supportedSensorCaps.
-            [DllImport(lib, EntryPoint = "ovrHmd_StartSensor", CallingConvention = CallingConvention.Winapi)]
-            [return: MarshalAs(UnmanagedType.I1)]
-            public static extern bool StartSensor(ovrHmd hmd,
-                HMDisplayCaps supportedSensorCaps,
-                HMDisplayCaps requiredSensorCaps);
-
-            // Stops sensor sampling, shutting down internal resources.
-            [DllImport(lib, EntryPoint = "ovrHmd_StopSensor", CallingConvention = CallingConvention.Winapi)]
-            public static extern void StopSensor(ovrHmd hmd);
-
-            // Resets sensor orientation.
-            [DllImport(lib, EntryPoint = "ovrHmd_ResetSensor", CallingConvention = CallingConvention.Winapi)]
-            public static extern void ResetSensor(ovrHmd hmd);
-
-            // Returns sensor state reading based on the specified absolute system time.
-            // Pass absTime value of 0.0 to request the most recent sensor reading; in this case
-            // both PredictedPose and SamplePose will have the same value.
-            // ovrHmd_GetEyePredictedSensorState relies on this internally.
-            // This may also be used for more refined timing of FrontBuffer rendering logic, etc.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetSensorState", CallingConvention = CallingConvention.Winapi)]
-            public static extern SensorState GetSensorState(ovrHmd hmd, double absTime);
-
-            // Returns information about a sensor.
-            // Only valid after StartSensor.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetSensorDesc", CallingConvention = CallingConvention.Winapi)]
-            [return: MarshalAs(UnmanagedType.I1)]
-            public static extern bool GetSensorDesc(ovrHmd hmd, StringBuilder descOut);
-
-            #endregion
-
-            #region Graphics Setup
-
-            // Fills in description about HMD; this is the same as filled in by ovrHmd_Create.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetDesc", CallingConvention = CallingConvention.Winapi)]
-            public static extern void GetDesc(ovrHmd hmd, out HMDisplayDescription desc);
-
-            // Calculates texture size recommended for rendering one eye within HMD, given FOV cone.
-            // Higher FOV will generally require larger textures to maintain quality.
-            //  - pixelsPerDisplayPixel specifies that number of render target pixels per display
-            //    pixel at center of distortion; 1.0 is the default value. Lower values
-            //    can improve performance.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetFovTextureSize", CallingConvention = CallingConvention.Winapi)]
-            public static extern OculusSize GetFovTextureSize(ovrHmd hmd, EyeType eye, FovPort fov,
-                float pixelsPerDisplayPixel);
-
-            #endregion
-
-            #region SDK Rendering
-
-            // These functions support rendering of distortion by the SDK through direct
-            // access to the underlying rendering HW, such as D3D or GL.
-            // This is the recommended approach, as it allows for better support or future
-            // Oculus hardware and a range of low-level optimizations.
-
-
-            // Configures rendering; fills in computed render parameters.
-            // This function can be called multiple times to change rendering settings.
-            // The users pass in two eye view descriptors that are used to
-            // generate complete rendering information for each eye in eyeRenderDescOut[2].
-            //
-            //  - apiConfig provides D3D/OpenGL specific parameters. Pass null
-            //    to shutdown rendering and release all resources.
-            //  - distortionCaps describe distortion settings that will be applied.
-            //
-            [return: MarshalAs(UnmanagedType.I1)]
-            [DllImport(lib, EntryPoint = "ovrHmd_ConfigureRendering", CallingConvention = CallingConvention.Winapi)]
-            public static extern bool ConfigureRendering(ovrHmd hmd,
-                ref RenderConfiguration apiConfig,
-                DistortionCaps distortionCaps,
-                [MarshalAs(UnmanagedType.LPArray, SizeConst=2)] FovPort[] eyeFovIn,
-                [MarshalAs(UnmanagedType.LPArray, SizeConst=2)] EyeRenderDescription[] eyeRenderDescOut);
-
-
-            // Begins a frame, returning timing and orientation information useful for simulation.
-            // This should be called in the beginning of game rendering loop (on render thread).
-            // This function relies on ovrHmd_BeginFrameTiming for some of its functionality.
-            // Pass 0 for frame index if not using GetFrameTiming.
-            [DllImport(lib, EntryPoint = "ovrHmd_BeginFrame", CallingConvention = CallingConvention.Winapi)]
-            public static extern FrameTiming BeginFrame(ovrHmd hmd, int frameIndex);
-
-            // Ends frame, rendering textures to frame buffer. This may perform distortion and scaling
-            // internally, assuming is it not delegated to another thread. 
-            // Must be called on the same thread as BeginFrame. Calls ovrHmd_BeginEndTiming internally.
-            // *** This Function will to Present/SwapBuffers and potentially wait for GPU Sync ***.
-            [DllImport(lib, EntryPoint = "ovrHmd_EndFrame", CallingConvention = CallingConvention.Winapi)]
-            public static extern void EndFrame(ovrHmd hmd);
-
-
-            // Marks beginning of eye rendering. Must be called on the same thread as BeginFrame.
-            // This function uses ovrHmd_GetEyePose to predict sensor state that should be
-            // used rendering the specified eye.
-            // This combines current absolute time with prediction that is appropriate for this HMD.
-            // It is ok to call ovrHmd_BeginEyeRender() on both eyes before calling ovrHmd_EndEyeRender.
-            // If rendering one eye at a time, it is best to render eye specified by
-            // HmdDesc.EyeRenderOrder[0] first.
-            [DllImport(lib, EntryPoint = "ovrHmd_BeginEyeRender", CallingConvention = CallingConvention.Winapi)]
-            public static extern OculusPose BeginEyeRender(ovrHmd hmd, EyeType eye);
-
-            // Marks the end of eye rendering and submits the eye texture for display after it is ready.
-            // Rendering viewport within the texture can change per frame if necessary.
-            // Specified texture may be presented immediately or wait until ovrHmd_EndFrame based
-            // on the implementation. The API performs distortion and scaling internally.
-            // 'renderPose' will typically be the value returned from ovrHmd_BeginEyeRender, but can
-            // be different if a different pose was used for rendering.
-            [DllImport(lib, EntryPoint = "ovrHmd_EndEyeRender", CallingConvention = CallingConvention.Winapi)]
-            public static extern void EndEyeRender(ovrHmd hmd, EyeType eye,
-                OculusPose renderPose, ref OculusTexture eyeTexture);
-
-            #endregion
-
-            #region Game-Side Rendering Functions
-
-            // These functions provide distortion data and render timing support necessary to allow
-            // game rendering of distortion. Game-side rendering involves the following steps:
-            //
-            //  1. Setup ovrEyeDesc based on desired texture size and Fov.
-            //     Call ovrHmd_GetRenderDesc to get the necessary rendering parameters for each eye.
-            // 
-            //  2. Use ovrHmd_CreateDistortionMesh to generate distortion mesh.
-            //
-            //  3. Use ovrHmd_BeginFrameTiming, ovrHmd_GetEyePose and ovrHmd_BeginFrameTiming
-            //     in the rendering loop to obtain timing and predicted view orientation for
-            //     each eye.
-            //      - If relying on timewarp, use ovr_WaitTillTime after rendering+flush, followed
-            //        by ovrHmd_GetEyeTimewarpMatrices to obtain timewarp matrices used 
-            //        in distortion pixel shader to reduce latency.
-            //
-
-            // Computes distortion viewport, view adjust and other rendering for the specified
-            // eye. This can be used instead of ovrHmd_ConfigureRendering to help setup rendering on
-            // the game side.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetRenderDesc", CallingConvention = CallingConvention.Winapi)]
-            public static extern EyeRenderDescription GetRenderDescription(ovrHmd hmd,
-                EyeType eyeType, FovPort fov);
-
-            // Generate distortion mesh per eye.
-            // Distortion capabilities will depend on 'distortionCaps' flags; user should rely on
-            // appropriate shaders based on their settings.
-            // Distortion mesh data will be allocated and stored into the ovrDistortionMesh data structure,
-            // which should be explicitly freed with ovrHmd_DestroyDistortionMesh.
-            // Users should call ovrHmd_GetRenderScaleAndOffset to get uvScale and Offset values for rendering.
-            // The function shouldn't fail unless theres is a configuration or memory error, in which case
-            // ovrDistortionMesh values will be set to null.
-            [DllImport(lib, EntryPoint = "ovrHmd_CreateDistortionMesh", CallingConvention = CallingConvention.Winapi)]
-            [return: MarshalAs(UnmanagedType.I1)]
-            public static extern bool CreateDistortionMesh(ovrHmd hmd,
-                EyeType eyeType, FovPort fov,
-                DistortionCaps distortionCaps,
-                ref DistortionMesh meshData);
-
-            // Frees distortion mesh allocated by ovrHmd_GenerateDistortionMesh. meshData elements
-            // are set to null and zeroes after the call.
-            [DllImport(lib, EntryPoint = "ovrHmd_DestroyDistortionMesh", CallingConvention = CallingConvention.Winapi)]
-            public static extern void DestroyDistortionMesh(ref DistortionMesh meshData);
-
-            // Computes updated 'uvScaleOffsetOut' to be used with a distortion if render target size or
-            // viewport changes after the fact. This can be used to adjust render size every frame, if desired.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetRenderScaleAndOffset", CallingConvention = CallingConvention.Winapi)]
-            public static extern void GetRenderScaleAndOffset(FovPort fov,
-                OculusSize textureSize, OculusRectangle renderViewport,
-                [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Vector2[] uvScaleOffsetOut);
-
-            // Thread-safe timing function for the main thread. Caller should increment frameIndex
-            // with every frame and pass the index to RenderThread for processing.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetFrameTiming", CallingConvention = CallingConvention.Winapi)]
-            public static extern FrameTiming GetFrameTiming(ovrHmd hmd, int frameIndex);
-
-            // Called at the beginning of the frame on the Render Thread.
-            // Pass frameIndex == 0 if ovrHmd_GetFrameTiming isn't being used. Otherwise,
-            // pass the same frame index as was used for GetFrameTiming on the main thread.
-            [DllImport(lib, EntryPoint = "ovrHmd_BeginFrameTiming", CallingConvention = CallingConvention.Winapi)]
-            public static extern FrameTiming BeginFrameTiming(ovrHmd hmd, int frameIndex);
-
-            // Marks the end of game-rendered frame, tracking the necessary timing information. This
-            // function must be called immediately after Present/SwapBuffers + GPU sync. GPU sync is important
-            // before this call to reduce latency and ensure proper timing.
-            [DllImport(lib, EntryPoint = "ovrHmd_EndFrameTiming", CallingConvention = CallingConvention.Winapi)]
-            public static extern void EndFrameTiming(ovrHmd hmd);
-
-            // Initializes and resets frame time tracking. This is typically not necessary, but
-            // is helpful if game changes vsync state or video mode. vsync is assumed to be on if this
-            // isn't called. Resets internal frame index to the specified number.
-            [DllImport(lib, EntryPoint = "ovrHmd_ResetFrameTiming", CallingConvention = CallingConvention.Winapi)]
-            public static extern void ResetFrameTiming(ovrHmd hmd, int frameIndex);
-
-            // Predicts and returns Pose that should be used rendering the specified eye.
-            // Must be called between ovrHmd_BeginFrameTiming & ovrHmd_EndFrameTiming.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetEyePose", CallingConvention = CallingConvention.Winapi)]
-            public static extern OculusPose GetEyePose(ovrHmd hmd, EyeType eye);
-
-            // Computes timewarp matrices used by distortion mesh shader, these are used to adjust
-            // for orientation change since the last call to ovrHmd_GetEyePose for this eye.
-            // The ovrDistortionVertex::TimeWarpFactor is used to blend between the matrices,
-            // usually representing two different sides of the screen.
-            // Must be called on the same thread as ovrHmd_BeginFrameTiming.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetEyeTimewarpMatrices", CallingConvention = CallingConvention.Winapi)]
-            public static extern void GetEyeTimewarpMatrices(ovrHmd hmd, EyeType eye,
-                OculusPose renderPose, [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Matrix4[] twmOut);
-
-            #endregion
-
-            #region Stateless math setup functions
-
-            // Used to generate projection from ovrEyeDesc::Fov.
-            [DllImport(lib, EntryPoint = "ovrMatrix4f_Projection", CallingConvention = CallingConvention.Winapi)]
-            public static extern Matrix4 Projection(FovPort fov,
-                float znear, float zfar, [MarshalAs(UnmanagedType.I1)] bool rightHanded );
-
-            // Used for 2D rendering, Y is down
-            // orthoScale = 1.0f / pixelsPerTanAngleAtCenter
-            // orthoDistance = distance from camera, such as 0.8m
-            [DllImport(lib, EntryPoint = "ovrMatrix4f_OrthoSubProjection", CallingConvention = CallingConvention.Winapi)]
-            public static extern Matrix4 OrthoSubProjection(Matrix4 projection, Vector2 orthoScale,
-                float orthoDistance, float eyeViewAdjustX);
-
-            // Returns global, absolute high-resolution time in seconds. This is the same
-            // value as used in sensor messages.
-            [DllImport(lib, EntryPoint = "ovr_GetTimeInSeconds", CallingConvention = CallingConvention.Winapi)]
-            public static extern double GetTimeInSeconds();
-
-            // Waits until the specified absolute time.
-            [DllImport(lib, EntryPoint = "ovr_WaitTillTime", CallingConvention = CallingConvention.Winapi)]
-            public static extern double WaitTillTime(double absTime);
-
-            #endregion
-
-            #region Latency Test interface
-
-            // Does latency test processing and returns 'TRUE' if specified rgb color should
-            // be used to clear the screen.
-            [DllImport(lib, EntryPoint = "ovrHmd_ProcessLatencyTest", CallingConvention = CallingConvention.Winapi)]
-            [return: MarshalAs(UnmanagedType.I1)]
-            public static extern bool ProcessLatencyTest(ovrHmd hmd,
-                [Out][MarshalAs(UnmanagedType.LPStr, SizeConst = 3)] byte rgbColorOut);
-
-            // Returns non-null string once with latency test result, when it is available.
-            // Buffer is valid until next call.
-            [DllImport(lib, EntryPoint = "ovrHmd_GetLatencyTestResult", CallingConvention = CallingConvention.Winapi)]
-            public static extern IntPtr GetLatencyTestResultPointer(ovrHmd hmd);
-            public static string GetLatencyTestResult(ovrHmd hmd)
-            {
-                return Marshal.PtrToStringAnsi(GetLatencyTestResultPointer(hmd));
-            }
-
-            // Returns latency for HMDs that support internal latency testing via the
-            // pixel-read back method (-1 for invalid or N/A)
-            [DllImport(lib, EntryPoint = "ovrHmd_GetMeasuredLatencyTest2", CallingConvention = CallingConvention.Winapi)]
-            public static extern double GetMeasuredLatencyTest2(ovrHmd hmd);
-
-            #endregion
+            return Marshal.PtrToStringAnsi(GetLatencyTestResultPointer(hmd));
         }
+
+        /// <summary>
+        /// Returns latency for HMDs that support internal latency testing via the
+        /// pixel-read back method.
+        /// </summary>
+        /// <returns>
+        /// The results of the latency test in seconds, or -1 if the latency test failed.
+        /// </returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        [DllImport(lib, EntryPoint = "ovrHmd_GetMeasuredLatencyTest2", CallingConvention = CallingConvention.Winapi)]
+        public static extern double GetMeasuredLatencyTest2(ovrHmd hmd);
 
         #endregion
     }
@@ -893,8 +1136,11 @@ namespace OpenTK
         Position       = 0x0040,
     }
 
-    // Distortion capability bits reported by device.
-    // Used with ovrHmd_ConfigureRendering and ovrHmd_CreateDistortionMesh.
+    /// <summary>
+    /// Distortion capability bits reported by device.
+    /// Used with <see cref="OculusRift.ConfigureRendering"/> and
+    /// <see cref="OculusRift.CreateDistortionMesh"/>.
+    /// </summary>
     [Flags]
     public enum DistortionCaps
     {
@@ -959,7 +1205,7 @@ namespace OpenTK
         PositionConnected     = 0x0020,
 
         /// <summary>
-        /// HMD Display is available & connected.
+        /// HMD Display is connected and available.
         /// </summary>
         HMDisplayConnected = 0x0080
     }
@@ -1188,27 +1434,37 @@ namespace OpenTK
         public float RightTan;
     }
 
+    /// <summary>
+    /// Describes a head-mounted display device.
+    /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    struct HMDisplayDescription
+    public struct HMDisplayDescription
     {
         /// <summary>
         /// Handle of this HMD.
         /// </summary>
         public ovrHmd Handle;
+
+        /// <summary>
+        /// A <see cref="HMDisplayType"/> value representing the type of the display.
+        /// </summary>
         public HMDisplayType Type;
 
         IntPtr ProductNamePtr;
         IntPtr ManufacturerPtr;
 
         /// <summary>
-        /// Name string describing the product: "Oculus Rift DK1", etc.
+        /// A <see cref="System.String"/> describing the product: "Oculus Rift DK1", etc.
         /// </summary>
-        /// <value>The name of the product.</value>
         public string ProductName
         {
             get { return Marshal.PtrToStringAnsi(ProductNamePtr); }
         }
 
+        /// <summary>
+        /// A <see cref="System.String"/> describing the manufacturer of the product.
+        /// </summary>
+        /// <value>The manufacturer.</value>
         public string Manufacturer
         {
             get { return Marshal.PtrToStringAnsi(ManufacturerPtr); }
@@ -1217,7 +1473,7 @@ namespace OpenTK
         /// <summary>
         /// Capability bits described by <see cref="HMDisplayCaps"/>.
         /// </summary>
-        public HMDisplayCaps HMDisplayCaps;
+        public HMDisplayCaps DisplayCaps;
 
         /// <summary>
         /// Capability bits described by <see cref="SensorCaps"/>.
@@ -1277,10 +1533,29 @@ namespace OpenTK
         // such as a API-specific functions that return adapter, ot something that will
         // work with our monitor driver.
 
-        // Windows: "\\\\.\\DISPLAY3", etc. Can be used in EnumDisplaySettings/CreateDC.
         IntPtr DisplayDeviceNamePtr;
-        // MacOS
-        int DisplayId;
+
+        /// <summary>
+        /// Returns the name of the display: "\\\\.\\DISPLAY3", etc. Can be used in EnumDisplaySettings/CreateDC.
+        /// This property is only valid on Windows; on other platforms it will return <see cref="System.String.Empty"/>
+        /// </summary>
+        public string DisplayDeviceName
+        {
+            get
+            {
+                if (DisplayDeviceNamePtr != IntPtr.Zero)
+                {
+                    return Marshal.PtrToStringAnsi(DisplayDeviceNamePtr);
+                }
+                return String.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Returns the id of the display.
+        /// This property is only valid on Mac OS X.
+        /// </summary>
+        public int DisplayId;
     }
 
     /// <summary>
@@ -1318,7 +1593,7 @@ namespace OpenTK
     /// Note that the rendering viewport is not included here as it can be 
     /// specified separately and modified per frame though:
     ///    (a) calling <see cref="OculusRift.GetRenderScaleAndOffset"/>with game-rendered api,
-    /// or (b) passing different values in <see cref="Texture"/> in case of SDK-rendered distortion.
+    /// or (b) passing different values in <see cref="OculusTexture"/> in case of SDK-rendered distortion.
     /// </summary>
     public struct EyeRenderDescription
     {
@@ -1418,8 +1693,8 @@ namespace OpenTK
     /// Represts frame timing information reported by <see cref="OculusRift.BeginFrameTiming"/>
     /// <para>
     /// It is generally expected that the following hold:
-    /// ThisFrameSeconds < TimewarpPointSeconds < NextFrameSeconds < 
-    /// EyeScanoutSeconds[EyeOrder[0]] <= ScanoutMidpointSeconds <= EyeScanoutSeconds[EyeOrder[1]]
+    /// ThisFrameSeconds &lt; TimewarpPointSeconds &lt; NextFrameSeconds &lt; 
+    /// EyeScanoutSeconds[EyeOrderFirst] &lt;= ScanoutMidpointSeconds &lt;= EyeScanoutSeconds[EyeOrderSecond]
     /// </para>
     /// </summary>
     public struct FrameTiming
@@ -1468,7 +1743,7 @@ namespace OpenTK
 
     /// <summary>
     /// A platform-independent rendering configuration, which is
-    /// part of the return value of <see cref="OculusRift.Configure"/>.
+    /// used in <see cref="OculusRift.ConfigureRendering"/>.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
     public struct RenderConfiguration
@@ -1489,6 +1764,7 @@ namespace OpenTK
         public int Multisample;
 
         // Platform-specific configuration
+        #pragma warning disable 0169
         IntPtr PlatformData0;
         IntPtr PlatformData1;
         IntPtr PlatformData2;
@@ -1497,6 +1773,7 @@ namespace OpenTK
         IntPtr PlatformData5;
         IntPtr PlatformData6;
         IntPtr PlatformData7;
+        #pragma warning restore 0169
     }
 
     /// <summary>
@@ -1522,6 +1799,7 @@ namespace OpenTK
         public OculusRectangle RenderViewport;
 
         // Platform-specific configuration
+        #pragma warning disable 0169
         IntPtr PlatformData0;
         IntPtr PlatformData1;
         IntPtr PlatformData2;
@@ -1530,6 +1808,7 @@ namespace OpenTK
         IntPtr PlatformData5;
         IntPtr PlatformData6;
         IntPtr PlatformData7;
+        #pragma warning restore 0169
     }
 
     #endregion
