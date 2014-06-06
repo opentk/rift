@@ -33,7 +33,7 @@ using System.Runtime.InteropServices;
 
 namespace OpenTK
 {
-    using ovrHmd = IntPtr;
+    using ovrHmd = HMDisplay;
 
     /// <summary>
     /// Provides bindings for the libOVR C API.
@@ -121,7 +121,7 @@ namespace OpenTK
         /// </summary>
         /// <param name="hmd">A valid HMD handle obtained by <see cref="Create"/>.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_Destroy", CallingConvention = CallingConvention.Winapi)]
-        public static extern void Destroy(ovrHmd hmd);
+        public static extern void Destroy(this ovrHmd hmd);
 
         /// <summary>
         /// Creates a "fake" HMD used for debugging only. This is not tied to specific hardware,
@@ -143,7 +143,7 @@ namespace OpenTK
         /// or <see cref="System.IntPtr.Zero"/> to obtain the global error state (for <see cref="Initialize"/> etc).
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetLastError", CallingConvention = CallingConvention.Winapi)]
-        static extern IntPtr GetLastError(ovrHmd hmd);
+        static extern IntPtr GetLastError(this ovrHmd hmd);
 
         /// <summary>
         /// Returns capability bits that are enabled at this time; described by <see cref="HMDisplayCaps"/>.
@@ -153,7 +153,7 @@ namespace OpenTK
         /// <returns>A bitwise combination of <see cref="HMDisplayCaps"/> flags representing the enabled capabilities.</returns>
         /// <param name="hmd">A valid HMD handle.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
-        public static extern HMDisplayCaps GetEnabledCaps(ovrHmd hmd);
+        public static extern HMDisplayCaps GetEnabledCaps(this ovrHmd hmd);
 
         /// <summary>
         /// Modifies capability bits described by ovrHmdCaps that can be modified,
@@ -162,7 +162,7 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="hmdCaps">A bitwise combination of the <see cref="HMDisplayCaps"/> flags to enable</param>
         [DllImport(lib, EntryPoint = "ovrHmd_SetEnabledCaps", CallingConvention = CallingConvention.Winapi)]
-        public static extern void SetEnabledCaps(ovrHmd hmd, HMDisplayCaps hmdCaps);
+        public static extern void SetEnabledCaps(this ovrHmd hmd, HMDisplayCaps hmdCaps);
 
         #endregion
 
@@ -190,7 +190,7 @@ namespace OpenTK
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_StartSensor", CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool StartSensor(ovrHmd hmd,
+        public static extern bool StartSensor(this ovrHmd hmd,
             SensorCaps supportedSensorCaps,
             SensorCaps requiredSensorCaps);
 
@@ -203,7 +203,7 @@ namespace OpenTK
         /// from different threads.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_StopSensor", CallingConvention = CallingConvention.Winapi)]
-        public static extern void StopSensor(ovrHmd hmd);
+        public static extern void StopSensor(this ovrHmd hmd);
 
         /// <summary>
         /// Resets sensor orientation.
@@ -214,7 +214,7 @@ namespace OpenTK
         /// from different threads.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_ResetSensor", CallingConvention = CallingConvention.Winapi)]
-        public static extern void ResetSensor(ovrHmd hmd);
+        public static extern void ResetSensor(this ovrHmd hmd);
 
         /// <summary>
         /// Returns sensor state reading based on the specified absolute system time.
@@ -230,7 +230,7 @@ namespace OpenTK
         /// from different threads.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_GetSensorState", CallingConvention = CallingConvention.Winapi)]
-        public static extern SensorState GetSensorState(ovrHmd hmd, double absTime);
+        public static extern SensorState GetSensorState(this ovrHmd hmd, double absTime);
 
         /// <summary>
         /// Returns information about a sensor.
@@ -248,7 +248,7 @@ namespace OpenTK
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_GetSensorDesc", CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool GetSensorDescription(ovrHmd hmd, StringBuilder descOut);
+        public static extern bool GetSensorDescription(this ovrHmd hmd, StringBuilder descOut);
 
         #endregion
 
@@ -260,7 +260,7 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="desc">A <see cref="HMDisplayDescription"/> instance containing information about an HMD.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetDesc", CallingConvention = CallingConvention.Winapi)]
-        public static extern void GetDescription(ovrHmd hmd, out HMDisplayDescription desc);
+        public static extern void GetDescription(this ovrHmd hmd, out HMDisplayDescription desc);
 
         /// <summary>
         /// Gets the recommended texture size for a single eye and given FOV cone.
@@ -276,7 +276,7 @@ namespace OpenTK
         /// can improve performance.
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetFovTextureSize", CallingConvention = CallingConvention.Winapi)]
-        public static extern OculusSize GetFovTextureSize(ovrHmd hmd, EyeType eye, FovPort fov,
+        public static extern OculusSize GetFovTextureSize(this ovrHmd hmd, EyeType eye, FovPort fov,
             float pixelsPerDisplayPixel);
 
         #endregion
@@ -312,7 +312,7 @@ namespace OpenTK
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_ConfigureRendering", CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool ConfigureRendering(ovrHmd hmd,
+        public static extern bool ConfigureRendering(this ovrHmd hmd,
             ref RenderConfiguration apiConfig,
             DistortionCaps distortionCaps,
             [MarshalAs(UnmanagedType.LPArray, SizeConst=2)] FovPort[] eyeFovIn,
@@ -333,7 +333,7 @@ namespace OpenTK
         /// Oculus hardware and a range of low-level optimizations.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_BeginFrame", CallingConvention = CallingConvention.Winapi)]
-        public static extern FrameTiming BeginFrame(ovrHmd hmd, int frameIndex);
+        public static extern FrameTiming BeginFrame(this ovrHmd hmd, int frameIndex);
 
         /// <summary>
         /// Ends frame, rendering textures to frame buffer. This may perform distortion and scaling
@@ -349,7 +349,7 @@ namespace OpenTK
         /// Oculus hardware and a range of low-level optimizations.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_EndFrame", CallingConvention = CallingConvention.Winapi)]
-        public static extern void EndFrame(ovrHmd hmd);
+        public static extern void EndFrame(this ovrHmd hmd);
 
         /// <summary>
         /// Marks beginning of eye rendering. Must be called on the same thread as BeginFrame.
@@ -370,7 +370,7 @@ namespace OpenTK
         /// Oculus hardware and a range of low-level optimizations.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_BeginEyeRender", CallingConvention = CallingConvention.Winapi)]
-        public static extern OculusPose BeginEyeRender(ovrHmd hmd, EyeType eye);
+        public static extern OculusPose BeginEyeRender(this ovrHmd hmd, EyeType eye);
 
         /// <summary>
         /// Marks the end of eye rendering and submits the eye texture for display after it is ready.
@@ -392,7 +392,7 @@ namespace OpenTK
         /// Oculus hardware and a range of low-level optimizations.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_EndEyeRender", CallingConvention = CallingConvention.Winapi)]
-        public static extern void EndEyeRender(ovrHmd hmd, EyeType eye,
+        public static extern void EndEyeRender(this ovrHmd hmd, EyeType eye,
             OculusPose renderPose, ref OculusTexture eyeTexture);
 
         #endregion
@@ -425,7 +425,7 @@ namespace OpenTK
         /// <param name="eyeType">The <see cref="EyeType"/> for the left or right eye.</param>
         /// <param name="fov">The desired <see cref="FovPort"/> configuration.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetRenderDesc", CallingConvention = CallingConvention.Winapi)]
-        public static extern EyeRenderDescription GetRenderDescription(ovrHmd hmd,
+        public static extern EyeRenderDescription GetRenderDescription(this ovrHmd hmd,
             EyeType eyeType, FovPort fov);
 
         /// <summary>
@@ -448,7 +448,7 @@ namespace OpenTK
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_CreateDistortionMesh", CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool CreateDistortionMesh(ovrHmd hmd,
+        public static extern bool CreateDistortionMesh(this ovrHmd hmd,
             EyeType eyeType, FovPort fov,
             DistortionCaps distortionCaps,
             out DistortionMesh meshData);
@@ -487,7 +487,7 @@ namespace OpenTK
         /// The user is responsible for incrementing this value on every frame.
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetFrameTiming", CallingConvention = CallingConvention.Winapi)]
-        public static extern FrameTiming GetFrameTiming(ovrHmd hmd, int frameIndex);
+        public static extern FrameTiming GetFrameTiming(this ovrHmd hmd, int frameIndex);
 
         /// <summary>
         /// Marks the beginning of the frame on the Render Thread.
@@ -499,7 +499,7 @@ namespace OpenTK
         /// pass the same frame index as was used for GetFrameTiming on the main thread.
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_BeginFrameTiming", CallingConvention = CallingConvention.Winapi)]
-        public static extern FrameTiming BeginFrameTiming(ovrHmd hmd, int frameIndex);
+        public static extern FrameTiming BeginFrameTiming(this ovrHmd hmd, int frameIndex);
 
         /// <summary>
         /// Marks the end of game-rendered frame, tracking the necessary timing information. This
@@ -508,7 +508,7 @@ namespace OpenTK
         /// </summary>
         /// <param name="hmd">A valid HMD handle.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_EndFrameTiming", CallingConvention = CallingConvention.Winapi)]
-        public static extern void EndFrameTiming(ovrHmd hmd);
+        public static extern void EndFrameTiming(this ovrHmd hmd);
 
         /// <summary>
         /// Initializes and resets frame time tracking. This is typically not necessary, but
@@ -518,7 +518,7 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="frameIndex">Specifies the frame index to reset to.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_ResetFrameTiming", CallingConvention = CallingConvention.Winapi)]
-        public static extern void ResetFrameTiming(ovrHmd hmd, int frameIndex);
+        public static extern void ResetFrameTiming(this ovrHmd hmd, int frameIndex);
 
         /// <summary>
         /// Predicts and returns Pose that should be used rendering the specified eye.
@@ -528,7 +528,7 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetEyePose", CallingConvention = CallingConvention.Winapi)]
-        public static extern OculusPose GetEyePose(ovrHmd hmd, EyeType eye);
+        public static extern OculusPose GetEyePose(this ovrHmd hmd, EyeType eye);
 
         /// <summary>
         /// Computes timewarp matrices used by distortion mesh shader, these are used to adjust
@@ -545,7 +545,7 @@ namespace OpenTK
         /// the timewarp matrix for each eye.
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetEyeTimewarpMatrices", CallingConvention = CallingConvention.Winapi)]
-        public static extern void GetEyeTimewarpMatrices(ovrHmd hmd, EyeType eye,
+        public static extern void GetEyeTimewarpMatrices(this ovrHmd hmd, EyeType eye,
             OculusPose renderPose, [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Matrix4[] twmOut);
 
         #endregion
@@ -609,7 +609,7 @@ namespace OpenTK
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_ProcessLatencyTest", CallingConvention = CallingConvention.Winapi)]
         [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool ProcessLatencyTest(ovrHmd hmd,
+        public static extern bool ProcessLatencyTest(this ovrHmd hmd,
             [Out][MarshalAs(UnmanagedType.LPStr, SizeConst = 3)] byte rgbColorOut);
 
         /// <summary>
@@ -618,7 +618,7 @@ namespace OpenTK
         /// <returns>A pointer to a null-terminated string that contains the results of the latency test.</returns>
         /// <param name="hmd">A valid HMD handle.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetLatencyTestResult", CallingConvention = CallingConvention.Winapi)]
-        public static extern IntPtr GetLatencyTestResultPointer(ovrHmd hmd);
+        public static extern IntPtr GetLatencyTestResultPointer(this ovrHmd hmd);
 
         /// <summary>
         /// Returns the results of the latency test. This is a blocking call.
@@ -626,7 +626,7 @@ namespace OpenTK
         /// </summary>
         /// <returns>A <see cref="System.String"/> that contains the results of the latency test.</returns>
         /// <param name="hmd">A valid HMD handle.</param>
-        public static string GetLatencyTestResult(ovrHmd hmd)
+        public static string GetLatencyTestResult(this ovrHmd hmd)
         {
             return Marshal.PtrToStringAnsi(GetLatencyTestResultPointer(hmd));
         }
@@ -640,7 +640,7 @@ namespace OpenTK
         /// </returns>
         /// <param name="hmd">A valid HMD handle.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetMeasuredLatencyTest2", CallingConvention = CallingConvention.Winapi)]
-        public static extern double GetMeasuredLatencyTest2(ovrHmd hmd);
+        public static extern double GetMeasuredLatencyTest2(this ovrHmd hmd);
 
         #endregion
     }
@@ -1443,6 +1443,110 @@ namespace OpenTK
         IntPtr PlatformData7;
         #pragma warning restore 0169
     }
+
+    /// <summary>
+    /// Represents a head-mounted display.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public partial struct HMDisplay : IComparable<HMDisplay>, IEquatable<HMDisplay>
+    {
+        /// <summary>
+        /// Gets the handle for this instance.
+        /// </summary>
+        /// <value>The handle.</value>
+        public IntPtr Handle { get; private set; }
+
+        /// <summary>
+        /// Defines a Zero (invalid) instance.
+        /// </summary>
+        public static readonly HMDisplay Zero =
+            new HMDisplay();
+
+        #region Public members
+
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="OpenTK.HMDisplay"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with the current <see cref="OpenTK.HMDisplay"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="System.Object"/> is equal to the current
+        /// <see cref="OpenTK.HMDisplay"/>; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj)
+        {
+            return
+                (obj is HMDisplay) &&
+                ((HMDisplay)obj).Equals(this);
+        }
+
+        /// <summary>
+        /// Serves as a hash function for a <see cref="OpenTK.HMDisplay"/> object.
+        /// </summary>
+        /// <returns>A hash code for this instance that is suitable for use in hashing algorithms and data structures such as a
+        /// hash table.</returns>
+        public override int GetHashCode()
+        {
+            return Handle.GetHashCode();
+        }
+
+        /// <summary>
+        /// Returns a <see cref="System.String"/> that represents the current <see cref="OpenTK.HMDisplay"/>.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that represents the current <see cref="OpenTK.HMDisplay"/>.</returns>
+        public override string ToString()
+        {
+            return string.Format("[HMDisplay: Handle={0}]", Handle);
+        }
+
+        /// <summary>Tests two <see cref="HMDisplay"/> instances for equality.</summary>
+        /// <param name="left">The <see cref="HMDisplay"/> instance at the left-hand side of the operator.</param>
+        /// <param name="right">The <see cref="HMDisplay"/> instance at the right-hand side of the operator.</param>
+        public static bool operator ==(HMDisplay left, HMDisplay right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <summary>Tests two <see cref="HMDisplay"/> instances for inequality.</summary>
+        /// <param name="left">The <see cref="HMDisplay"/> instance at the left-hand side of the operator.</param>
+        /// <param name="right">The <see cref="HMDisplay"/> instance at the right-hand side of the operator.</param>
+        public static bool operator !=(HMDisplay left, HMDisplay right)
+        {
+            return !left.Equals(right);
+        }
+
+        #endregion
+
+        #region IComparable implementation
+
+        /// <summary>
+        /// Returns the sort order of the current instance compared to the specified <see cref="HMDisplay"/>.
+        /// </summary>
+        /// <returns>
+        /// A negative number if the current instance is less than other;
+        /// a positive number if more; zero if equal.
+        /// </returns>
+        /// <param name="other">Other.</param>
+        public int CompareTo(HMDisplay other)
+        {
+            return ((long)Handle).CompareTo((long)other.Handle);
+        }
+
+        #endregion
+
+        #region IEquatable implementation
+
+        /// <summary>
+        /// Determines whether the specified <see cref="OpenTK.HMDisplay"/> is equal to the current <see cref="OpenTK.HMDisplay"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="OpenTK.HMDisplay"/> to compare with the current <see cref="OpenTK.HMDisplay"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="OpenTK.HMDisplay"/> is equal to the current
+        /// <see cref="OpenTK.HMDisplay"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(HMDisplay other)
+        {
+            return Handle == other.Handle;
+        }
+
+        #endregion
+    }
+
 
     #endregion
 

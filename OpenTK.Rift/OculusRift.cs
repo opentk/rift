@@ -48,7 +48,7 @@ namespace OpenTK
         bool disposed;
 
         // For compatibility with the old 0.2.x API
-        IntPtr instance;
+        HMDisplay instance;
         HMDisplayDescription description;
         float prediction_delta;
         bool prediction_enabled;
@@ -74,7 +74,7 @@ namespace OpenTK
             if (count > 0)
             {
                 instance = VR.Create(0);
-                if (instance != IntPtr.Zero)
+                if (instance != HMDisplay.Zero)
                 {
                     VR.GetDescription(instance, out description);
                 }
@@ -95,7 +95,7 @@ namespace OpenTK
             get
             {
                 CheckDisposed();
-                return instance != IntPtr.Zero;
+                return instance != HMDisplay.Zero;
             }
         }
 
