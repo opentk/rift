@@ -263,6 +263,18 @@ namespace OpenTK
         public static extern void GetDescription(this ovrHmd hmd, out HMDisplayDescription desc);
 
         /// <summary>
+        /// Fills in description about HMD; this is the same as filled in by <see cref="Create"/>.
+        /// </summary>
+        /// <returns>The description.</returns>
+        /// <param name="hmd">A valid HMD handle.</param>
+        public static HMDisplayDescription GetDescription(this ovrHmd hmd)
+        {
+            HMDisplayDescription desc;
+            GetDescription(hmd, out desc);
+            return desc;
+        }
+
+        /// <summary>
         /// Gets the recommended texture size for a single eye and given FOV cone.
         /// Higher FOV will generally require larger textures to maintain quality.
         /// </summary>
@@ -360,7 +372,7 @@ namespace OpenTK
         /// If rendering one eye at a time, it is best to render eye specified by
         /// <see cref="HMDisplayDescription.EyeRenderOrderFirst"/> first.
         /// </summary>
-        /// <returns>An <see cref="OculusPose"/> instance.</returns>
+        /// <returns>An <see cref="EyePose"/> instance.</returns>
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
         /// <remarks>
@@ -370,7 +382,7 @@ namespace OpenTK
         /// Oculus hardware and a range of low-level optimizations.
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_BeginEyeRender", CallingConvention = CallingConvention.Winapi)]
-        public static extern OculusPose BeginEyeRender(this ovrHmd hmd, EyeType eye);
+        public static extern EyePose BeginEyeRender(this ovrHmd hmd, EyeType eye);
 
         /// <summary>
         /// Marks the end of eye rendering and submits the eye texture for display after it is ready.
@@ -381,8 +393,8 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
         /// <param name="renderPose">
-        /// A <see cref="OculusPose"/> returned by <see cref="BeginEyeRender"/>
-        /// or a custom <see cref="OculusPose"/>.
+        /// A <see cref="EyePose"/> returned by <see cref="BeginEyeRender"/>
+        /// or a custom <see cref="EyePose"/>.
         /// </param>
         /// <param name="eyeTexture">The <see cref="OculusTexture"/> to render.</param>
         /// <remarks>
@@ -393,7 +405,7 @@ namespace OpenTK
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_EndEyeRender", CallingConvention = CallingConvention.Winapi)]
         public static extern void EndEyeRender(this ovrHmd hmd, EyeType eye,
-            OculusPose renderPose, ref OculusTexture eyeTexture);
+            EyePose renderPose, ref OculusTexture eyeTexture);
 
         #endregion
 
@@ -524,11 +536,11 @@ namespace OpenTK
         /// Predicts and returns Pose that should be used rendering the specified eye.
         /// Must be called between <see cref="BeginFrameTiming"/> and <see cref="EndFrameTiming"/>.
         /// </summary>
-        /// <returns>The estimated <see cref="OculusPose"/> instance.</returns>
+        /// <returns>The estimated <see cref="EyePose"/> instance.</returns>
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetEyePose", CallingConvention = CallingConvention.Winapi)]
-        public static extern OculusPose GetEyePose(this ovrHmd hmd, EyeType eye);
+        public static extern EyePose GetEyePose(this ovrHmd hmd, EyeType eye);
 
         /// <summary>
         /// Computes timewarp matrices used by distortion mesh shader, these are used to adjust
@@ -539,14 +551,14 @@ namespace OpenTK
         /// </summary>
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
-        /// <param name="renderPose">The desired <see cref="OculusPose"/>.</param>
+        /// <param name="renderPose">The desired <see cref="EyePose"/>.</param>
         /// <param name="twmOut">
         /// Returns two <see cref="OpenTK.Matrix4"/> instances, representing
         /// the timewarp matrix for each eye.
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetEyeTimewarpMatrices", CallingConvention = CallingConvention.Winapi)]
         public static extern void GetEyeTimewarpMatrices(this ovrHmd hmd, EyeType eye,
-            OculusPose renderPose, [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Matrix4[] twmOut);
+            EyePose renderPose, [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Matrix4[] twmOut);
 
         #endregion
 
@@ -988,15 +1000,15 @@ namespace OpenTK
     /// Position and orientation together.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct OculusPose
+    public struct EyePose
     {
         /// <summary>
-        /// A <see cref="OpenTK.Quaternion"/> describing the orientation of this <see cref="OculusPose"/>.
+        /// A <see cref="OpenTK.Quaternion"/> describing the orientation of this <see cref="EyePose"/>.
         /// </summary>
         public Quaternion Orientation;
 
         /// <summary>
-        /// A <see cref="OpenTK.Vector3"/> describing the position of this <see cref="OculusPose"/>.
+        /// A <see cref="OpenTK.Vector3"/> describing the position of this <see cref="EyePose"/>.
         /// </summary>
         public Vector3 Position;
     }
@@ -1008,9 +1020,9 @@ namespace OpenTK
     public struct PoseState
     {
         /// <summary>
-        /// The <see cref="OculusPose"/> for this <see cref="PoseState"/>.
+        /// The <see cref="EyePose"/> for this <see cref="PoseState"/>.
         /// </summary>
-        public OculusPose Pose;
+        public EyePose Pose;
 
         /// <summary>
         /// A <see cref="OpenTK.Vector3"/> representing the angular velocity of this <see cref="PoseState"/>.
@@ -1448,7 +1460,7 @@ namespace OpenTK
     /// Represents a head-mounted display.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public partial struct HMDisplay : IComparable<HMDisplay>, IEquatable<HMDisplay>
+    public partial struct HMDisplay : IComparable<HMDisplay>, IEquatable<HMDisplay>, IDisposable
     {
         /// <summary>
         /// Gets the handle for this instance.
@@ -1542,6 +1554,26 @@ namespace OpenTK
         public bool Equals(HMDisplay other)
         {
             return Handle == other.Handle;
+        }
+
+        #endregion
+
+        #region IDisposable implementation
+
+        /// <summary>
+        /// Releases all resource used by the <see cref="OpenTK.HMDisplay"/> object.
+        /// </summary>
+        /// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="OpenTK.HMDisplay"/>. The
+        /// <see cref="Dispose"/> method leaves the <see cref="OpenTK.HMDisplay"/> in an unusable state. After calling
+        /// <see cref="Dispose"/>, you must release all references to the <see cref="OpenTK.HMDisplay"/> so the garbage
+        /// collector can reclaim the memory that the <see cref="OpenTK.HMDisplay"/> was occupying.</remarks>
+        public void Dispose()
+        {
+            if (Handle != IntPtr.Zero)
+            {
+                VR.Destroy(this);
+                Handle = IntPtr.Zero;
+            }
         }
 
         #endregion
