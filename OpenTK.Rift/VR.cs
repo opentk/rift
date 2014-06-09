@@ -432,8 +432,8 @@ namespace OpenTK
         // These functions provide distortion data and render timing support necessary to allow
         // game rendering of distortion. Game-side rendering involves the following steps:
         //
-        //  1. Setup ovrEyeDesc based on desired texture size and Fov.
-        //     Call <see cref="GetRenderDesc"/> to get the necessary rendering parameters for each eye.
+        //  1. Setup <see cref="EyeRenderDescription"/>based on desired texture size and Fov.
+        //     Call <see cref="GetRenderDescription"/> to get the necessary rendering parameters for each eye.
         // 
         //  2. Use <see cref="CreateDistortionMesh"/> to generate distortion mesh.
         //
@@ -942,6 +942,17 @@ namespace OpenTK
         /// The y coordinate of this <see cref="VRPoint"/>.
         /// </summary>
         public int Y;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenTK.VRPoint"/> struct.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        public VRPoint(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 
     /// <summary>
@@ -959,6 +970,17 @@ namespace OpenTK
         /// The height of this <see cref="VRSize"/>.
         /// </summary>
         public int Height;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenTK.VRSize"/> struct.
+        /// </summary>
+        /// <param name="width">The width of this instance.</param>
+        /// <param name="height">The height of this instance.</param>
+        public VRSize(int width, int height)
+        {
+            Width = width;
+            Height = height;
+        }
     }
 
     /// <summary>
@@ -970,7 +992,7 @@ namespace OpenTK
         /// <summary>
         /// An <see cref="VRPoint"/> resresenting the top-left corner of this <see cref="VRRectangle"/>.
         /// </summary>
-        public VRPoint Point;
+        public VRPoint Location;
 
         /// <summary>
         /// An <see cref="VRSize"/> resresenting the width and height of this <see cref="VRRectangle"/>.
@@ -982,8 +1004,8 @@ namespace OpenTK
         /// </summary>
         public int X
         {
-            get { return Point.X; }
-            set { Point.X = value; }
+            get { return Location.X; }
+            set { Location.X = value; }
         }
 
         /// <summary>
@@ -991,8 +1013,8 @@ namespace OpenTK
         /// </summary>
         public int Y
         {
-            get { return Point.Y; }
-            set { Point.Y = value; }
+            get { return Location.Y; }
+            set { Location.Y = value; }
         }
 
         /// <summary>
@@ -1011,6 +1033,19 @@ namespace OpenTK
         {
             get { return Size.Height; }
             set { Size.Height = value; }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenTK.VRRectangle"/> struct.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <param name="width">The width of this rectangle.</param>
+        /// <param name="height">The height of this rectangle.</param>
+        public VRRectangle(int x, int y, int width, int height)
+        {
+            Location = new VRPoint(x, y);
+            Size = new VRSize(width, height);
         }
     }
 
