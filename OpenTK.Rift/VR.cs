@@ -1479,7 +1479,7 @@ namespace OpenTK
     /// <see cref="OpenTK.VR.EndFrame" />.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct VRTexture
+    public struct VRTextureHeader
     {
         /// <summary>
         /// The <see cref="RenderApiType"/> for this configuration.
@@ -1495,6 +1495,135 @@ namespace OpenTK
         /// Pixel viewport in texture that holds eye image.
         /// </summary>
         public VRRectangle RenderViewport;
+    }
+
+    /// <summary>
+    /// Defines the platform-specific portion of a <see cref="VRTexture"/>
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit)]
+    public struct VRTexture
+    {
+        /// <summary>
+        /// Platform-independent information
+        /// </summary>
+        [FieldOffset(0)]
+        public VRTextureHeader Header;
+
+        /// <summary>
+        /// Defines OpenGL-specific data for <see cref="VRTexture"/>
+        /// </summary>
+        [FieldOffset(0)]
+        public VRTextureGL GL;
+
+        /// <summary>
+        /// Defines D3D11-specific data for <see cref="VRTexture"/>
+        /// </summary>
+        [FieldOffset(0)]
+        public VRTextureD3D11 D3D11;
+
+        /// <summary>
+        /// Defines D3D10-specific data for <see cref="VRTexture"/>
+        /// </summary>
+        [FieldOffset(0)]
+        public VRTextureD3D10 D3D10;
+
+        /// <summary>
+        /// Defines D3D9-specific data for <see cref="VRTexture"/>
+        /// </summary>
+        [FieldOffset(0)]
+        public VRTextureD3D9 D3D9;
+
+        #pragma warning disable 0169
+        [FieldOffset(0)]
+        VRTextureOpaque Opaque;
+        #pragma warning restore 0169
+    }
+
+    /// <summary>
+    /// Defines D3D11-specific data for <see cref="VRTexture"/>
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VRTextureD3D11
+    {
+        /// <summary>
+        /// Platform-independent information
+        /// </summary>
+        public VRTextureHeader Header;
+
+        /// <summary>
+        /// An ID3D11Texture2D pointer
+        /// </summary>
+        public IntPtr Texture;
+
+        /// <summary>
+        /// An ID3D11ShaderResourceView pointer
+        /// </summary>
+        public IntPtr SRView;
+    }
+
+    /// <summary>
+    /// Defines D3D10-specific data for <see cref="VRTexture"/>
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VRTextureD3D10
+    {
+        /// <summary>
+        /// Platform-independent information
+        /// </summary>
+        public VRTextureHeader Header;
+
+        /// <summary>
+        /// An ID3D10Texture2D pointer
+        /// </summary>
+        public IntPtr Texture;
+
+        /// <summary>
+        /// An ID3D10ShaderResourceView pointer
+        /// </summary>
+        public IntPtr SRView;
+    }
+
+    /// <summary>
+    /// Defines D3D9-specific data for <see cref="VRTexture"/>
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VRTextureD3D9
+    {
+        /// <summary>
+        /// Platform-independent information
+        /// </summary>
+        public VRTextureHeader Header;
+
+        /// <summary>
+        /// An IDirect3DTexture9 pointer
+        /// </summary>
+        public IntPtr Texture;
+    }
+
+    /// <summary>
+    /// Defines OpenGL-specific data for <see cref="VRTexture"/>
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct VRTextureGL
+    {
+        /// <summary>
+        /// Platform-independent information
+        /// </summary>
+        public VRTextureHeader Header;
+
+        /// <summary>
+        /// An OpenGL texture handle generated via <see cref="OpenTK.Graphics.OpenGL.GL.GenTexture()"/>
+        /// </summary>
+        public int TexId;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    struct VRTextureOpaque
+    {
+        /// <summary>
+        /// Platform-independent information
+        /// </summary>
+        public VRTextureHeader Header;
 
         // Platform-specific configuration
         #pragma warning disable 0169
