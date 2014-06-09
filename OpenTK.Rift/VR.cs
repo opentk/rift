@@ -95,7 +95,7 @@ namespace OpenTK
 
         /// <summary>
         /// Detects or re-detects HMDs and reports the total number detected.
-        /// Users can get information about each HMD by calling ovrHmd_Create with an index.
+        /// Users can get information about each HMD by calling <see cref="Create(int)"/> with an index.
         /// </summary>
         /// <returns>The total number of HMDs detected.</returns>
         [DllImport(lib, EntryPoint = "ovrHmd_Detect", CallingConvention = CallingConvention.Winapi)]
@@ -134,16 +134,35 @@ namespace OpenTK
 
         /// <summary>
         /// Returns a string representing the last HMD error.
+        /// To obtain the global error state, use <see cref="GetLastError()"/> instead.
+        /// This method allocates managed memory.
         /// </summary>
         /// <returns>A <see cref="System.String"/> representing the last HMD error,
         /// or <see cref="System.String.Empty"/> if no error has occured.
         /// </returns>
         /// <param name="hmd">
-        /// An HMD handle obtained by <see cref="Create"/> or <see cref="CreateDebug"/>,
-        /// or <see cref="System.IntPtr.Zero"/> to obtain the global error state (for <see cref="Initialize"/> etc).
+        /// An valid HMD handle obtained by <see cref="Create"/> or <see cref="CreateDebug"/>.
         /// </param>
+        public static string GetLastError(this ovrHmd hmd)
+        {
+            return Marshal.PtrToStringAnsi(GetLastErrorInternal(hmd));
+        }
+
+        /// <summary>
+        /// Returns a string representing the last global error.
+        /// To obtain the error state of a specific HMD, use <see cref="GetLastError(HMDisplay)"/> instead.
+        /// This method allocates managed memory.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> representing the last HMD error,
+        /// or <see cref="System.String.Empty"/> if no error has occured.
+        /// </returns>
+        public static string GetLastError()
+        {
+            return Marshal.PtrToStringAnsi(GetLastErrorInternal(HMDisplay.Zero));
+        }
+
         [DllImport(lib, EntryPoint = "ovrHmd_GetLastError", CallingConvention = CallingConvention.Winapi)]
-        static extern IntPtr GetLastError(this ovrHmd hmd);
+        static extern IntPtr GetLastErrorInternal(this ovrHmd hmd);
 
         /// <summary>
         /// Returns capability bits that are enabled at this time; described by <see cref="HMDisplayCaps"/>.
@@ -156,8 +175,7 @@ namespace OpenTK
         public static extern HMDisplayCaps GetEnabledCaps(this ovrHmd hmd);
 
         /// <summary>
-        /// Modifies capability bits described by ovrHmdCaps that can be modified,
-        /// such as ovrHmd_LowPersistance.
+        /// Modifies capability bits described by ovrHmdCaps that can be modified.
         /// </summary>
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="hmdCaps">A bitwise combination of the <see cref="HMDisplayCaps"/> flags to enable</param>
@@ -365,7 +383,7 @@ namespace OpenTK
 
         /// <summary>
         /// Marks beginning of eye rendering. Must be called on the same thread as BeginFrame.
-        /// This function uses ovrHmd_GetEyePose to predict sensor state that should be
+        /// This function uses <see cref="GetEyePose"/> to predict sensor state that should be
         /// used rendering the specified eye.
         /// This combines current absolute time with prediction that is appropriate for this HMD.
         /// It is ok to call BeginEyeRender() on both eyes before calling <see cref="EndEyeRender"/>.
@@ -415,15 +433,15 @@ namespace OpenTK
         // game rendering of distortion. Game-side rendering involves the following steps:
         //
         //  1. Setup ovrEyeDesc based on desired texture size and Fov.
-        //     Call ovrHmd_GetRenderDesc to get the necessary rendering parameters for each eye.
+        //     Call <see cref="GetRenderDesc"/> to get the necessary rendering parameters for each eye.
         // 
-        //  2. Use ovrHmd_CreateDistortionMesh to generate distortion mesh.
+        //  2. Use <see cref="CreateDistortionMesh"/> to generate distortion mesh.
         //
-        //  3. Use ovrHmd_BeginFrameTiming, ovrHmd_GetEyePose and ovrHmd_BeginFrameTiming
+        //  3. Use <see cref="BeginFrameTiming"/>, <see cref="GetEyePose"/> and <see cref="BeginFrameTiming"/>
         //     in the rendering loop to obtain timing and predicted view orientation for
         //     each eye.
         //      - If relying on timewarp, use ovr_WaitTillTime after rendering+flush, followed
-        //        by ovrHmd_GetEyeTimewarpMatrices to obtain timewarp matrices used 
+        //        by <see cref="GetEyeTimewarpMatrices"/> to obtain timewarp matrices used 
         //        in distortion pixel shader to reduce latency.
         //
 
@@ -544,7 +562,7 @@ namespace OpenTK
 
         /// <summary>
         /// Computes timewarp matrices used by distortion mesh shader, these are used to adjust
-        /// for orientation change since the last call to ovrHmd_GetEyePose for this eye.
+        /// for orientation change since the last call to <see cref="GetEyePose"/> for this eye.
         /// The <see cref="DistortionVertex.TimeWarpFactor"/> is used to blend between the matrices,
         /// usually representing two different sides of the screen.
         /// Must be called on the same thread as <see cref="BeginFrameTiming"/>.
@@ -760,7 +778,7 @@ namespace OpenTK
 
     /// <summary>
     /// Sensor capability bits reported by device.
-    /// Used with ovrHmd_StartSensor.
+    /// Used with <see cref="StartSensor"/>.
     /// </summary>
     [Flags]
     public enum SensorCaps
