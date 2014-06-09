@@ -414,7 +414,7 @@ namespace OpenTK
         /// A <see cref="EyePose"/> returned by <see cref="BeginEyeRender"/>
         /// or a custom <see cref="EyePose"/>.
         /// </param>
-        /// <param name="eyeTexture">The <see cref="OculusTexture"/> to render.</param>
+        /// <param name="eyeTexture">The <see cref="VRTexture"/> to render.</param>
         /// <remarks>
         /// This function supports rendering of distortion by the SDK through direct
         /// access to the underlying rendering HW, such as D3D or GL.
@@ -423,7 +423,7 @@ namespace OpenTK
         /// </remarks>
         [DllImport(lib, EntryPoint = "ovrHmd_EndEyeRender", CallingConvention = CallingConvention.Winapi)]
         public static extern void EndEyeRender(this ovrHmd hmd, EyeType eye,
-            EyePose renderPose, ref OculusTexture eyeTexture);
+            EyePose renderPose, ref VRTexture eyeTexture);
 
         #endregion
 
@@ -1256,7 +1256,7 @@ namespace OpenTK
     /// Note that the rendering viewport is not included here as it can be 
     /// specified separately and modified per frame though:
     ///    (a) calling <see cref="OpenTK.VR.GetRenderScaleAndOffset"/>with game-rendered api,
-    /// or (b) passing different values in <see cref="OculusTexture"/> in case of SDK-rendered distortion.
+    /// or (b) passing different values in <see cref="VRTexture"/> in case of SDK-rendered distortion.
     /// </summary>
     public struct EyeRenderDescription
     {
@@ -1444,7 +1444,7 @@ namespace OpenTK
     /// <see cref="OpenTK.VR.EndFrame" />.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct OculusTexture
+    public struct VRTexture
     {
         /// <summary>
         /// The <see cref="RenderApiType"/> for this configuration.
