@@ -252,7 +252,7 @@ namespace OpenTK
 
         /// <summary>
         /// Returns information about a sensor.
-        /// Only valid after StartSensor.
+        /// Only valid after <see cref="StartSensor"/>.
         /// </summary>
         /// <returns><c>true</c>, if a sensor desc was obtained successfully; <c>false</c> otherwise.</returns>
         /// <param name="hmd">A valid HMD handle.</param>
@@ -778,7 +778,7 @@ namespace OpenTK
 
     /// <summary>
     /// Sensor capability bits reported by device.
-    /// Used with <see cref="StartSensor"/>.
+    /// Used with <see cref="VR.StartSensor"/>.
     /// </summary>
     [Flags]
     public enum SensorCaps
