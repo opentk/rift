@@ -41,6 +41,7 @@ namespace OpenTK
     /// <summary>
     /// Provides high-level access to an Oculus Rift device.
     /// </summary>
+    [Obsolete("Use the VR class to access the official libOVR C API")]
     public class OculusRift : IDisposable
     {
         static int instance_count;
