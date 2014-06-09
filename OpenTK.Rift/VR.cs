@@ -335,7 +335,7 @@ namespace OpenTK
         /// instances describing the rendering settings for each eye.
         /// </param>
         /// <remarks>
-        /// This function support rendering of distortion by the SDK through direct
+        /// This function supports rendering of distortion by the SDK through direct
         /// access to the underlying rendering HW, such as D3D or GL.
         /// This is the recommended approach, as it allows for better support or future
         /// Oculus hardware and a range of low-level optimizations.
@@ -357,7 +357,7 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="frameIndex">The frame index. Pass 0 for frame index if not using GetFrameTiming.</param>
         /// <remarks>
-        /// This function support rendering of distortion by the SDK through direct
+        /// This function supports rendering of distortion by the SDK through direct
         /// access to the underlying rendering HW, such as D3D or GL.
         /// This is the recommended approach, as it allows for better support or future
         /// Oculus hardware and a range of low-level optimizations.
@@ -373,7 +373,7 @@ namespace OpenTK
         /// </summary>
         /// <param name="hmd">A valid HMD handle.</param>
         /// <remarks>
-        /// This function support rendering of distortion by the SDK through direct
+        /// This function supports rendering of distortion by the SDK through direct
         /// access to the underlying rendering HW, such as D3D or GL.
         /// This is the recommended approach, as it allows for better support or future
         /// Oculus hardware and a range of low-level optimizations.
@@ -394,7 +394,7 @@ namespace OpenTK
         /// <param name="hmd">A valid HMD handle.</param>
         /// <param name="eye">The <see cref="EyeType"/> for the left or right eye.</param>
         /// <remarks>
-        /// This function support rendering of distortion by the SDK through direct
+        /// This function supports rendering of distortion by the SDK through direct
         /// access to the underlying rendering HW, such as D3D or GL.
         /// This is the recommended approach, as it allows for better support or future
         /// Oculus hardware and a range of low-level optimizations.
@@ -416,7 +416,7 @@ namespace OpenTK
         /// </param>
         /// <param name="eyeTexture">The <see cref="OculusTexture"/> to render.</param>
         /// <remarks>
-        /// This function support rendering of distortion by the SDK through direct
+        /// This function supports rendering of distortion by the SDK through direct
         /// access to the underlying rendering HW, such as D3D or GL.
         /// This is the recommended approach, as it allows for better support or future
         /// Oculus hardware and a range of low-level optimizations.
@@ -1353,7 +1353,7 @@ namespace OpenTK
     }
 
     /// <summary>
-    /// Represts frame timing information reported by <see cref="OpenTK.VR.BeginFrameTiming"/>
+    /// Represents frame timing information reported by <see cref="OpenTK.VR.BeginFrameTiming"/>
     /// <para>
     /// It is generally expected that the following hold:
     /// ThisFrameSeconds &lt; TimewarpPointSeconds &lt; NextFrameSeconds &lt; 
