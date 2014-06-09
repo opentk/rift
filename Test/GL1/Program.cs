@@ -32,6 +32,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -39,33 +40,41 @@ namespace OpenTK.Rift.Test
 {
     class Program : GameWindow
     {
-        static readonly OculusRift Rift = new OculusRift();
-        static readonly DisplayDevice RiftDisplay =
-            (Enumerable
-                .Range((int)DisplayIndex.First, (int)DisplayIndex.Sixth)
-                .Select(i => DisplayDevice.GetDisplay(DisplayIndex.First + i))
-                .Where(d => d != null && d.Width == Rift.HResolution && d.Height == Rift.VResolution)
-                .FirstOrDefault()) ??
-            DisplayDevice.Default;
+        readonly HMDisplay Display;
+        readonly HMDisplayDescription DisplayDesc;
+        readonly EyeRenderDescription[] EyeDesc =
+            new EyeRenderDescription[2];
 
-        readonly OculusCamera Camera = new OculusCamera(
-            Rift,
-            new Vector3(0, 1.6f, 5f),
-            Quaternion.Identity);
+        // GL textures for VR rendering
+        readonly int[] EyeTexture = new int[2];
 
+        int frame;
         float angle;
+        Vector3 position;
 
         public Program()
-            : base(
-                RiftDisplay.Width,
-                RiftDisplay.Height,
-                new GraphicsMode(32, 24, 0, 16),
-                "OpenTK Oculus Rift Test",
-                //Rift.IsConnected ? 
-                //    GameWindowFlags.Fullscreen :
-                    GameWindowFlags.Default,
-                RiftDisplay)
         {
+            Display = CreateVRDisplay();
+            if (Display == HMDisplay.Zero)
+            {
+                throw new NotSupportedException("Failed to connect to a VR device.");
+            }
+
+            // General properties of the HMDisplay.
+            // These properties do not generally change at runtime.
+            DisplayDesc = Display.GetDescription();
+
+            // Current rendering properties of the HMDisplay.
+            // These properties can be modified at runtime, if desired.
+            var left = Display.GetRenderDescription(
+                EyeType.Left, DisplayDesc.DefaultEyeFovLeft);
+            var right = Display.GetRenderDescription(
+                EyeType.Right, DisplayDesc.DefaultEyeFovRight);
+
+            // Store the left and right eyes in the recommended rendering order.
+            // This reduces latency.
+            EyeDesc[0] = DisplayDesc.EyeRenderOrderFirst == EyeType.Left ? left : right;
+            EyeDesc[1] = DisplayDesc.EyeRenderOrderSecond == EyeType.Left ? left : right;
         }
 
         #region Protected Members
@@ -73,11 +82,18 @@ namespace OpenTK.Rift.Test
         protected override void OnLoad(EventArgs e)
         {
             GL.Enable(EnableCap.DepthTest);
+
+            EyeTexture[0] = GL.GenTexture();
+            EyeTexture[1] = GL.GenTexture();
         }
 
         protected override void OnUnload(EventArgs e)
         {
-            Rift.Dispose();
+            if (Display != HMDisplay.Zero)
+            {
+                Display.Destroy();
+            }
+            VR.Shutdown();
         }
 
         protected override void OnResize(EventArgs e)
@@ -93,68 +109,119 @@ namespace OpenTK.Rift.Test
 
             angle += 16 * (float)TargetUpdatePeriod;
 
-            if (Keyboard[Key.Right])
-                half_ipd *= 1.01f;
-            if (Keyboard[Key.Left])
-                half_ipd *= 0.99f;
             if (Keyboard[Key.Down])
-                Camera.Position = Vector3.Multiply(Camera.Position, new Vector3(1, 1, 1.01f));
+                position = Vector3.Multiply(position, new Vector3(1, 1, 1.01f));
             if (Keyboard[Key.Up])
-                Camera.Position = Vector3.Multiply(Camera.Position, new Vector3(1, 1, 0.99f));
-            if (Keyboard[Key.BracketLeft])
-                Rift.PredictionDelta *= 0.99f;
-            if (Keyboard[Key.BracketRight])
-                Rift.PredictionDelta *= 1.01f;
+                position = Vector3.Multiply(position, new Vector3(1, 1, 0.99f));
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            Display.BeginFrame(frame++);
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            DrawScene(CameraType.Left);
-            DrawScene(CameraType.Right);
+            for (int i = 0; i < 1; i++)
+            {
+                var eye = EyeDesc[i].Eye;
+                var pose = Display.BeginEyeRender(eye);
+                var fov = EyeDesc[i].Fov;
 
-            SwapBuffers();
+                DrawScene(eye, fov);
+
+                var texture = new VRTexture();
+                texture.Header.Api = RenderApiType.OpenGL;
+                texture.Header.RenderViewport = GetViewport(eye);
+                texture.Header.TextureSize = Display.GetFovTextureSize(eye, fov, 1.0f);
+                texture.GL.TexId = EyeTexture[i];
+
+                Display.EndEyeRender(eye, pose, ref texture);
+            }
+
+            //SwapBuffers();
+            Display.EndFrame();
         }
 
         #endregion
 
         #region Private Members
 
-        float half_ipd = Rift.InterpupillaryDistance * 0.5f;
-        void DrawScene(CameraType camera_type)
+        HMDisplay CreateVRDisplay()
         {
-            Matrix4 matrix;
+            var device = HMDisplay.Zero;
 
-            SetupViewport(camera_type);
+            // Initialize libOVR and open the first connected device.
+            // If no device is connected, create a debug device for testing.
+            if (!VR.Initialize())
+            {
+                var error = VR.GetLastError();
+                throw new NotSupportedException("libOVR initialization failed with: " + error);
+            }
 
-            Camera.GetProjectionMatrix(camera_type, out matrix);
+            int device_count = VR.Detect();
+            Console.WriteLine("Detected {0} device(s).", device_count);
+
+            if (device_count > 0)
+            {
+                Console.Write("Opening device 0... ");
+                device = VR.Create(0);
+
+                if (device != HMDisplay.Zero)
+                {
+                    Console.WriteLine("success!");
+                }
+                else
+                {
+                    Console.WriteLine("failed.");
+                    Console.WriteLine("Error was '{0}'", VR.GetLastError());
+                }
+            }
+
+            if (device == HMDisplay.Zero)
+            {
+                Console.Write("Opening debug device... ");
+                device = VR.CreateDebug(HMDisplayType.DK1);
+
+                if (device != HMDisplay.Zero)
+                {
+                    Console.WriteLine("success!");
+                }
+                else
+                {
+                    Console.WriteLine("failed.");
+                    Console.WriteLine("Error was '{0}'", VR.GetLastError());
+                }
+            }
+
+            return device;
+        }
+
+        void DrawScene(EyeType eye, FovPort fov)
+        {
+            var proj = VR.Projection(fov, 0.1f, 128.0f, true);
             GL.MatrixMode(MatrixMode.Projection);
-            GL.LoadMatrix(ref matrix);
+            GL.LoadMatrix(ref proj);
 
-            Camera.GetModelviewMatrix(camera_type, out matrix);
             GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadMatrix(ref matrix);
-
+            GL.LoadIdentity();
+            GL.Translate(position);
             GL.Rotate(angle, 0.0f, 1.0f, 0.0f);
+
             DrawCube();
         }
 
-        void SetupViewport(CameraType camera_type)
+        VRRectangle GetViewport(EyeType eye)
         {
-            switch (camera_type)
+            switch (eye)
             {
-                case CameraType.Default:
-                    GL.Viewport(0, 0, Width, Height);
-                    break;
+                case EyeType.Left:
+                    return new VRRectangle(0, 0, Width / 2, Height);
 
-                case CameraType.Left:
-                    GL.Viewport(0, 0, Width / 2, Height);
-                    break;
+                case EyeType.Right:
+                    return new VRRectangle(Width / 2, 0, Width / 2, Height);
 
-                case CameraType.Right:
-                    GL.Viewport(Width / 2, 0, Width / 2, Height);
-                    break;
+                default:
+                    return new VRRectangle(0, 0, Width, Height);
             }
         }
 
