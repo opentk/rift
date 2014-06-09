@@ -306,7 +306,7 @@ namespace OpenTK
         /// can improve performance.
         /// </param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetFovTextureSize", CallingConvention = CallingConvention.Winapi)]
-        public static extern OculusSize GetFovTextureSize(this ovrHmd hmd, EyeType eye, FovPort fov,
+        public static extern VRSize GetFovTextureSize(this ovrHmd hmd, EyeType eye, FovPort fov,
             float pixelsPerDisplayPixel);
 
         #endregion
@@ -387,7 +387,7 @@ namespace OpenTK
         /// used rendering the specified eye.
         /// This combines current absolute time with prediction that is appropriate for this HMD.
         /// It is ok to call BeginEyeRender() on both eyes before calling <see cref="EndEyeRender"/>.
-        /// If rendering one eye at a time, it is best to render eye specified by
+        /// If rendering one eye at a time, it is best to render the eye specified by
         /// <see cref="HMDisplayDescription.EyeRenderOrderFirst"/> first.
         /// </summary>
         /// <returns>An <see cref="EyePose"/> instance.</returns>
@@ -503,7 +503,7 @@ namespace OpenTK
         /// <param name="uvScaleOffsetOut">Returns the uv scale offset for each eye.</param>
         [DllImport(lib, EntryPoint = "ovrHmd_GetRenderScaleAndOffset", CallingConvention = CallingConvention.Winapi)]
         public static extern void GetRenderScaleAndOffset(FovPort fov,
-            OculusSize textureSize, OculusRectangle renderViewport,
+            VRSize textureSize, VRRectangle renderViewport,
             [Out][MarshalAs(UnmanagedType.LPArray, SizeConst=2)] Vector2[] uvScaleOffsetOut);
 
         /// <summary>
@@ -931,15 +931,15 @@ namespace OpenTK
     /// Defines a 2d point.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct OculusPoint
+    public struct VRPoint
     {
         /// <summary>
-        /// The x coordinate of this <see cref="OculusPoint"/>.
+        /// The x coordinate of this <see cref="VRPoint"/>.
         /// </summary>
         public int X;
 
         /// <summary>
-        /// The y coordinate of this <see cref="OculusPoint"/>.
+        /// The y coordinate of this <see cref="VRPoint"/>.
         /// </summary>
         public int Y;
     }
@@ -948,15 +948,15 @@ namespace OpenTK
     /// Defines a 2d size.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct OculusSize
+    public struct VRSize
     {
         /// <summary>
-        /// The width of this <see cref="OculusSize"/>.
+        /// The width of this <see cref="VRSize"/>.
         /// </summary>
         public int Width;
 
         /// <summary>
-        /// The height of this <see cref="OculusSize"/>.
+        /// The height of this <see cref="VRSize"/>.
         /// </summary>
         public int Height;
     }
@@ -965,20 +965,20 @@ namespace OpenTK
     /// Defines a 2d rectangle.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct OculusRectangle
+    public struct VRRectangle
     {
         /// <summary>
-        /// An <see cref="OculusPoint"/> resresenting the top-left corner of this <see cref="OculusRectangle"/>.
+        /// An <see cref="VRPoint"/> resresenting the top-left corner of this <see cref="VRRectangle"/>.
         /// </summary>
-        public OculusPoint Point;
+        public VRPoint Point;
 
         /// <summary>
-        /// An <see cref="OculusSize"/> resresenting the width and height of this <see cref="OculusRectangle"/>.
+        /// An <see cref="VRSize"/> resresenting the width and height of this <see cref="VRRectangle"/>.
         /// </summary>
-        public OculusSize Size;
+        public VRSize Size;
 
         /// <summary>
-        /// Gets or sets the x coordinate of this <see cref="OculusRectangle"/>.
+        /// Gets or sets the x coordinate of this <see cref="VRRectangle"/>.
         /// </summary>
         public int X
         {
@@ -987,7 +987,7 @@ namespace OpenTK
         }
 
         /// <summary>
-        /// Gets or sets the y coordinate of this <see cref="OculusRectangle"/>.
+        /// Gets or sets the y coordinate of this <see cref="VRRectangle"/>.
         /// </summary>
         public int Y
         {
@@ -996,7 +996,7 @@ namespace OpenTK
         }
 
         /// <summary>
-        /// Gets or sets the width of this <see cref="OculusRectangle"/>.
+        /// Gets or sets the width of this <see cref="VRRectangle"/>.
         /// </summary>
         public int Width
         {
@@ -1005,7 +1005,7 @@ namespace OpenTK
         }
 
         /// <summary>
-        /// Gets or sets the height of this <see cref="OculusRectangle"/>.
+        /// Gets or sets the height of this <see cref="VRRectangle"/>.
         /// </summary>
         public int Height
         {
@@ -1151,12 +1151,12 @@ namespace OpenTK
         /// <summary>
         /// Resolution of the entire HMD screen (for both eyes) in pixels.
         /// </summary>
-        public OculusSize Resolution;
+        public VRSize Resolution;
 
         /// <summary>
         /// Where monitor window should be on screen or (0,0).
         /// </summary>
-        public OculusPoint WindowPos;
+        public VRPoint WindowPos;
 
         /// <summary>
         /// Recommended (default) optical FOV for the left eye.
@@ -1271,9 +1271,9 @@ namespace OpenTK
         public FovPort Fov;
 
         /// <summary>
-        /// An <see cref="OculusRectangle"/> representing the viewport after distortion.
+        /// An <see cref="VRRectangle"/> representing the viewport after distortion.
         /// </summary>
-        public OculusRectangle DistortedViewport;
+        public VRRectangle DistortedViewport;
 
         /// <summary>
         /// A <see cref="OpenTK.Vector2"/> represting the number of display pixels that will fit in tan(angle) = 1.
@@ -1417,9 +1417,9 @@ namespace OpenTK
         public RenderApiType Api;
 
         /// <summary>
-        /// An <see cref="OculusSize"/> instance representing the size of the render texture.
+        /// An <see cref="VRSize"/> instance representing the size of the render texture.
         /// </summary>
-        public OculusSize RTSize;
+        public VRSize RTSize;
 
         /// <summary>
         /// An <see cref="System.Int32"/> representing the antialiasing sample count.
@@ -1452,14 +1452,14 @@ namespace OpenTK
         public RenderApiType Api;
 
         /// <summary>
-        /// An <see cref="OculusSize"/> instance representing the size of this texture.
+        /// An <see cref="VRSize"/> instance representing the size of this texture.
         /// </summary>
-        public OculusSize TextureSize;
+        public VRSize TextureSize;
 
         /// <summary>
         /// Pixel viewport in texture that holds eye image.
         /// </summary>
-        public OculusRectangle RenderViewport;
+        public VRRectangle RenderViewport;
 
         // Platform-specific configuration
         #pragma warning disable 0169
